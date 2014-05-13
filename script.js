@@ -20,17 +20,18 @@ function start() {
     initWebGL(canvas);
 
     if (gl) {
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
-        gl.clearDepth(1.0);                 // Clear everything
-        gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-        gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clearDepth(1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
 
         initShaders();
 
         entities = [
-            createCube(2, [5, 0, -5], [0, 0, 0]),
-            createCube(2, [0, 0, 0], [0, 0, 0]),
-            createCube(2, [-5, 0, 5], [0, 0, 0])
+            createSphere(10, [1, 1, 1, 1], [5, 0, -5], [0, 0, 0])
+//            ,
+//            createCube(2, [0, 0, 0], [0, 0, 0]),
+//            createCube(2, [-5, 0, 5], [0, 0, 0])
         ];
 
         lines = [
@@ -73,79 +74,6 @@ function initWebGL() {
     }
 }
 
-function createCube(size, position, velocity) {
-    var vertices = [
-        // Front face
-        -1.0, -1.0, 1.0,
-        1.0, -1.0, 1.0,
-        1.0, 1.0, 1.0,
-        -1.0, 1.0, 1.0,
-
-        // Back face
-        -1.0, -1.0, -1.0,
-        -1.0, 1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, -1.0, -1.0,
-
-        // Top face
-        -1.0, 1.0, -1.0,
-        -1.0, 1.0, 1.0,
-        1.0, 1.0, 1.0,
-        1.0, 1.0, -1.0,
-
-        // Bottom face
-        -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0,
-        1.0, -1.0, 1.0,
-        -1.0, -1.0, 1.0,
-
-        // Right face
-        1.0, -1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, 1.0, 1.0,
-        1.0, -1.0, 1.0,
-
-        // Left face
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0, 1.0,
-        -1.0, 1.0, 1.0,
-        -1.0, 1.0, -1.0
-    ];
-
-    vertices = vertices.map(function(x) { return x * size/2; });
-
-    var colors = [
-        [1.0, 1.0, 1.0, 1.0],    // Front face: white
-        [1.0, 0.0, 0.0, 1.0],    // Back face: red
-        [0.0, 1.0, 0.0, 1.0],    // Top face: green
-        [0.0, 0.0, 1.0, 1.0],    // Bottom face: blue
-        [1.0, 1.0, 0.0, 1.0],    // Right face: yellow
-        [1.0, 0.0, 1.0, 1.0]     // Left face: purple
-    ];
-
-    // Convert the array of colors into a table for all the vertices.
-    var generatedColors = [];
-
-    for (var j = 0; j < 6; j++) {
-        var c = colors[j];
-
-        // Repeat each color four times for the four vertices of the face
-        for (var i = 0; i < 4; i++) {
-            generatedColors = generatedColors.concat(c);
-        }
-    }
-
-    var cubeVertexIndices = [
-        0,  1,  2,      0,  2,  3,    // front
-        4,  5,  6,      4,  6,  7,    // back
-        8,  9,  10,     8,  10, 11,   // top
-        12, 13, 14,     12, 14, 15,   // bottom
-        16, 17, 18,     16, 18, 19,   // right
-        20, 21, 22,     20, 22, 23    // left
-    ]
-
-    return createEntity(vertices, cubeVertexIndices, generatedColors, position, velocity);
-}
 
 function drawEntities() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -197,6 +125,9 @@ function drawEntities() {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, entity.colorBuffer);
         gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
 
