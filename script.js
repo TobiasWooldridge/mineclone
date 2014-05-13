@@ -1,8 +1,6 @@
 var canvas;
 var gl;
 
-var cubeRotation = 25.0;
-
 var mvMatrix;
 var shaderProgram;
 var vertexPositionAttribute;
@@ -12,8 +10,9 @@ var perspectiveMatrix;
 var lastUpdateTime = 0;
 
 var entities;
+var lines;
 
-var gravity = [0, -2, 0];
+var gravity = [0, -10, 0];
 
 function start() {
     canvas = document.getElementById("glcanvas");
@@ -29,9 +28,29 @@ function start() {
         initShaders();
 
         entities = [
-            createCube([4, 0, -4], [0, 0, 0]),
-            createCube([0, 0, 0], [0, 1, 0]),
-            createCube([-4, 0, 4], [0, 2, 0])
+            createCube(2, [5, 0, -5], [0, 0, 0]),
+            createCube(2, [0, 0, 0], [0, 0, 0]),
+            createCube(2, [-5, 0, 5], [0, 0, 0])
+        ];
+
+        lines = [
+            // Bottom side
+            createLine([10, -10, 10], [10,  -10, -10]),
+            createLine([10, -10, 10], [-10,  -10, 10]),
+            createLine([-10, -10, -10], [10,  -10, -10]),
+            createLine([-10, -10, -10], [-10,  -10, 10]),
+
+            // Top side
+            createLine([10, 10, 10], [10,  10, -10]),
+            createLine([10, 10, 10], [-10,  10, 10]),
+            createLine([-10, 10, -10], [10,  10, -10]),
+            createLine([-10, 10, -10], [-10,  10, 10]),
+
+            // Remaining edges
+            createLine([10, 10, 10], [10,  -10, 10]),
+            createLine([10, 10, -10], [10,  -10, -10]),
+            createLine([-10, 10, 10], [-10,  -10, 10]),
+            createLine([-10, 10, -10], [-10,  -10, -10])
         ];
 
         setInterval(drawEntities, 1000 / 75);
@@ -54,7 +73,7 @@ function initWebGL() {
     }
 }
 
-function createCube(position, velocity) {
+function createCube(size, position, velocity) {
     var vertices = [
         // Front face
         -1.0, -1.0, 1.0,
@@ -93,6 +112,8 @@ function createCube(position, velocity) {
         -1.0, 1.0, -1.0
     ];
 
+    vertices = vertices.map(function(x) { return x * size/2; });
+
     var colors = [
         [1.0, 1.0, 1.0, 1.0],    // Front face: white
         [1.0, 0.0, 0.0, 1.0],    // Back face: red
@@ -123,13 +144,21 @@ function createCube(position, velocity) {
         20, 21, 22,     20, 22, 23    // left
     ]
 
-    return createEntity(gl, vertices, cubeVertexIndices, generatedColors, position, velocity);
+    return createEntity(vertices, cubeVertexIndices, generatedColors, position, velocity);
 }
 
 function drawEntities() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    var fieldOfView = 40;
+
+    var cameraPosition = [0.0, 0, -35.0];
+
+    loadIdentity();
+    mvTranslate(cameraPosition);
+    mvPushMatrix();
+
+
+    var fieldOfView = 45;
     var aspectRatio = 16 / 9;
     var minRenderDistance = 0.1;
     var maxRenderDistance = 100;
@@ -144,10 +173,9 @@ function drawEntities() {
         return;
     }
 
+    // Draw all entities
     for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
-        loadIdentity();
         mvPushMatrix();
-        mvTranslate([0.0, 5.0, -17.0]);
 
         var entity = entities[entityIndex];
 
@@ -177,6 +205,30 @@ function drawEntities() {
 
         mvPopMatrix();
     }
+
+
+
+    // Draw all lines
+    mvPushMatrix();
+
+    for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        var line = lines[lineIndex];
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, line.vertexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, line.indexBuffer);
+
+        gl.vertexAttribPointer(shaderProgram.aposAttrib, 3, gl.FLOAT, false, 0, 0);
+        gl.lineWidth(1.0);
+        gl.uniform4f(shaderProgram.colorUniform, 1, 0, 0, 1);
+
+        setMatrixUniforms();
+        gl.drawElements(gl.LINES, 2, gl.UNSIGNED_SHORT, 0);
+    }
+
+    mvPopMatrix();
+
+
+    mvPopMatrix();
 }
 
 function initShaders() {
