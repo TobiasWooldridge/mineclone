@@ -1,17 +1,7 @@
 var canvas;
 var gl;
 
-var cubeVerticesBuffer;
-var cubeVerticesColorBuffer;
-var cubeVerticesIndexBuffer;
-var cubeRotation = 0.0;
-var cubeXOffset = 0.0;
-var cubeYOffset = 0.0;
-var cubeZOffset = 0.0;
-var lastCubeUpdateTime = 0;
-var xIncValue = 0.2;
-var yIncValue = -0.4;
-var zIncValue = 0.3;
+var cubeRotation = 25.0;
 
 var mvMatrix;
 var shaderProgram;
@@ -19,17 +9,16 @@ var vertexPositionAttribute;
 var vertexColorAttribute;
 var perspectiveMatrix;
 
-//
-// start
-//
-// Called when the canvas is created to get the ball rolling.
-//
+var lastUpdateTime = 0;
+
+var entities;
+
+var gravity = [0, -2, 0];
+
 function start() {
     canvas = document.getElementById("glcanvas");
 
-    initWebGL(canvas);      // Initialize the GL context
-
-    // Only continue if WebGL is available and working
+    initWebGL(canvas);
 
     if (gl) {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
@@ -39,9 +28,13 @@ function start() {
 
         initShaders();
 
-        initBuffers();
+        entities = [
+            createCube([4, 0, -4], [0, 0, 0]),
+            createCube([0, 0, 0], [0, 1, 0]),
+            createCube([-4, 0, 4], [0, 2, 0])
+        ];
 
-        setInterval(drawScene, 1000/75);
+        setInterval(drawEntities, 1000 / 75);
     }
 }
 
@@ -51,7 +44,7 @@ function initWebGL() {
     try {
         gl = canvas.getContext("experimental-webgl");
     }
-    catch(e) {
+    catch (e) {
     }
 
     // If we don't have a GL context, give up now
@@ -61,174 +54,129 @@ function initWebGL() {
     }
 }
 
-function initBuffers() {
-    // Create a buffer for the cube's vertices.
-    cubeVerticesBuffer = gl.createBuffer();
-
-    // Select the cubeVerticesBuffer as the one to apply vertex
-    // operations to from here out.
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-
-    // Now create an array of vertices for the cube.
+function createCube(position, velocity) {
     var vertices = [
         // Front face
-        -1.0, -1.0,  1.0,
-        1.0, -1.0,  1.0,
-        1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
+        -1.0, -1.0, 1.0,
+        1.0, -1.0, 1.0,
+        1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
 
         // Back face
         -1.0, -1.0, -1.0,
-        -1.0,  1.0, -1.0,
-        1.0,  1.0, -1.0,
+        -1.0, 1.0, -1.0,
+        1.0, 1.0, -1.0,
         1.0, -1.0, -1.0,
 
         // Top face
-        -1.0,  1.0, -1.0,
-        -1.0,  1.0,  1.0,
-        1.0,  1.0,  1.0,
-        1.0,  1.0, -1.0,
+        -1.0, 1.0, -1.0,
+        -1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, -1.0,
 
         // Bottom face
         -1.0, -1.0, -1.0,
         1.0, -1.0, -1.0,
-        1.0, -1.0,  1.0,
-        -1.0, -1.0,  1.0,
+        1.0, -1.0, 1.0,
+        -1.0, -1.0, 1.0,
 
         // Right face
         1.0, -1.0, -1.0,
-        1.0,  1.0, -1.0,
-        1.0,  1.0,  1.0,
-        1.0, -1.0,  1.0,
+        1.0, 1.0, -1.0,
+        1.0, 1.0, 1.0,
+        1.0, -1.0, 1.0,
 
         // Left face
         -1.0, -1.0, -1.0,
-        -1.0, -1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0,  1.0, -1.0
+        -1.0, -1.0, 1.0,
+        -1.0, 1.0, 1.0,
+        -1.0, 1.0, -1.0
     ];
 
-    // Build the shape from the vertices
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    // Now set up the colors for the faces. We'll use solid colors
-    // for each face.
     var colors = [
-        [1.0,  1.0,  1.0,  1.0],    // Front face: white
-        [1.0,  0.0,  0.0,  1.0],    // Back face: red
-        [0.0,  1.0,  0.0,  1.0],    // Top face: green
-        [0.0,  0.0,  1.0,  1.0],    // Bottom face: blue
-        [1.0,  1.0,  0.0,  1.0],    // Right face: yellow
-        [1.0,  0.0,  1.0,  1.0]     // Left face: purple
+        [1.0, 1.0, 1.0, 1.0],    // Front face: white
+        [1.0, 0.0, 0.0, 1.0],    // Back face: red
+        [0.0, 1.0, 0.0, 1.0],    // Top face: green
+        [0.0, 0.0, 1.0, 1.0],    // Bottom face: blue
+        [1.0, 1.0, 0.0, 1.0],    // Right face: yellow
+        [1.0, 0.0, 1.0, 1.0]     // Left face: purple
     ];
 
     // Convert the array of colors into a table for all the vertices.
     var generatedColors = [];
 
-    for (j=0; j<6; j++) {
+    for (j = 0; j < 6; j++) {
         var c = colors[j];
 
         // Repeat each color four times for the four vertices of the face
-        for (var i=0; i<4; i++) {
+        for (var i = 0; i < 4; i++) {
             generatedColors = generatedColors.concat(c);
         }
     }
 
-    cubeVerticesColorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(generatedColors), gl.STATIC_DRAW);
-
-    // Build the element array buffer; this specifies the indices
-    // into the vertex array for each face's vertices.
-
-    cubeVerticesIndexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-
-    // This array defines each face as two triangles, using the
-    // indices into the vertex array to specify each triangle's
-    // position.
-
     var cubeVertexIndices = [
-        8,  9,  10, 8,  10, 11,   // top
+        8, 9, 10, 8, 10, 11,   // top
         12, 13, 14, 12, 14, 15,   // bottom
         16, 17, 18, 16, 18, 19,   // right
         20, 21, 22, 20, 22, 23    // left
     ]
 
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-        new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+    return createEntity(gl, vertices, cubeVertexIndices, generatedColors, position, velocity);
 }
 
-function drawScene() {
-    // Clear the canvas
+function drawEntities() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var fieldOfView = 40;
-    var aspectRatio = 16/9;
+    var aspectRatio = 16 / 9;
     var minRenderDistance = 0.1;
     var maxRenderDistance = 100;
     perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
 
-    // Set the drawing position to the "identity" point, which is
-    // the center of the scene.
-    loadIdentity();
 
-    // Now move the drawing position a bit to where we want to start
-    // drawing the cube.
-    mvTranslate([-0.0, 0.0, -6.0]);
-
-    // Save the current matrix, then rotate before we draw.
-
-    mvPushMatrix();
-    mvRotate(cubeRotation, [1, 0, 1]);
-    mvTranslate([cubeXOffset, cubeYOffset, cubeZOffset]);
-
-    // Draw the cube by binding the array buffer to the cube's vertices
-    // array, setting attributes, and pushing it to GL.
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesBuffer);
-    gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-    // Set the colors attribute for the vertices.
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesColorBuffer);
-    gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-
-    // Draw the cube.
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-    setMatrixUniforms();
-    gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
-
-    // Restore the original matrix
-    mvPopMatrix();
-
-    // Update the rotation for the next draw, if it's time to do so.
     var currentTime = (new Date).getTime();
-    if (lastCubeUpdateTime) {
-        var delta = currentTime - lastCubeUpdateTime;
+    var timeDelta = currentTime - lastUpdateTime;
+    lastUpdateTime = currentTime;
 
-        cubeRotation += (30 * delta) / 1000.0;
-        cubeXOffset += xIncValue * ((30 * delta) / 1000.0);
-        cubeYOffset += yIncValue * ((30 * delta) / 1000.0);
-        cubeZOffset += zIncValue * ((30 * delta) / 1000.0);
-
-        if (Math.abs(cubeYOffset) > 2.5) {
-            xIncValue = -xIncValue;
-            yIncValue = -yIncValue;
-            zIncValue = -zIncValue;
-        }
+    if (timeDelta == currentTime) {
+        return;
     }
 
-    lastCubeUpdateTime = currentTime;
+    for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
+        loadIdentity();
+        mvPushMatrix();
+        mvTranslate([0.0, 5.0, -17.0]);
+
+        var entity = entities[entityIndex];
+
+        entity.accelerate(gravity, timeDelta);
+        entity.move(timeDelta);
+
+        mvTranslate(entity.position);
+
+        for (var i = 0; i < 3; i++)
+        {
+            if (entity.position[i] < -10 || entity.position[i] > 10) {
+                entity.position[i] = Math.max(-10, Math.min(entity.position[i], 10));
+                entity.velocity[i] *= -1;
+            }
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
+        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, entity.colorBuffer);
+        gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
+
+        setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
+
+        mvPopMatrix();
+    }
 }
 
-//
-// initShaders
-//
-// Initialize the shaders, so WebGL knows how to light our scene.
-//
 function initShaders() {
     var fragmentShader = getShader(gl, "shader-fs");
     var vertexShader = getShader(gl, "shader-vs");
@@ -269,7 +217,7 @@ function getShader(gl, id) {
     var theSource = "";
     var currentChild = shaderScript.firstChild;
 
-    while(currentChild) {
+    while (currentChild) {
         if (currentChild.nodeType == 3) {
             theSource += currentChild.textContent;
         }
