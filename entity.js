@@ -228,9 +228,9 @@ function createSphere(diameter, color, position, velocity, attributes) {
             var u = 1 - (longNumber / longitudeBands);
             var v = 1 - (latNumber / latitudeBands);
 
-            normals.push(0);
-            normals.push(0);
-            normals.push(0);
+            normals.push(x);
+            normals.push(y);
+            normals.push(z);
 
             vertices.push(radius * x);
             vertices.push(radius * y);
