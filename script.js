@@ -76,7 +76,7 @@ function initWebGL() {
     }
 }
 
-
+var angle = 20;
 function drawEntities() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -87,7 +87,7 @@ function drawEntities() {
     mvTranslate(cameraPosition);
     mvPushMatrix();
     mvRotate(20, [1, 0, 0]);
-    mvRotate(135, [0, 1, 0]);
+    mvRotate(angle++, [0, 1, 0]);
 
 
     var fieldOfView = 45;
