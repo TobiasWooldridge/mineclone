@@ -9,7 +9,7 @@ function createEntity(vertices, vertexIndices, normals, colors, position, veloci
         vertexIndexBuffer : vertexIndexBuffer,
         normalBuffer : normalBuffer,
         colorBuffer : colorBuffer,
-        numVertices : vertices.length,
+        triangles : vertexIndices.length/3,
         position : position,
         velocity : velocity,
         move : function move (timestep) {
@@ -56,28 +56,45 @@ function createIndexBuffer(data) {
 
 function createPlatform(size, color, position, velocity, attributes) {
     var vertices = [
-        -1.0, 0, -1.0,
-        1.0, 0, -1.0,
-        1.0, 0, 1.0,
-        -1.0, 0, 1.0
+        // Top face
+        -1.0, 0.0, -1.0,
+        -1.0, 0.0, 1.0,
+        1.0, 0.0, 1.0,
+        1.0, 0.0, -1.0
     ].map(function(x) { return x * size/2; });
 
     var normals = [
+        // Top
         0.0,  1.0,  0.0,
         0.0,  1.0,  0.0,
         0.0,  1.0,  0.0,
         0.0,  1.0,  0.0
     ];
 
-    var colors = [color, color, color, color, color, color];
+    var colors = [
+        color    // Front
+    ];
 
-    var cubeVertexIndices = [0, 1, 2, 0, 2, 3];
+    // Convert the array of colors into a table for all the vertices.
+    var generatedColors = [];
 
-    debugger;
+    for (var j = 0; j < 1; j++) {
+        var c = colors[j];
 
-    return createEntity(vertices, cubeVertexIndices, normals, colors, position, velocity, attributes);
+        // Repeat each color four times for the four vertices of the face
+        for (var i = 0; i < 4; i++) {
+            generatedColors = generatedColors.concat(c);
+        }
+    }
 
+    var cubeVertexIndices = [
+        0,  1,  2,      0,  2,  3    // front
+    ];
+
+
+    return createEntity(vertices, cubeVertexIndices, normals, generatedColors, position, velocity, attributes);
 }
+
 function createCube(size, color, position, velocity, attributes) {
     var vertices = [
         // Front face

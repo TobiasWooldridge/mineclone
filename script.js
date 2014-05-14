@@ -33,7 +33,7 @@ function start() {
             createCube(2, [0.25, 0.25, 1, 1], [5, 10, -5], [0, 0, 0]),
             createCube(2, [0.25, 1, 0.25, 1], [0, 7, 0], [0, 0, 0]),
             createCube(2, [1, 0.25, 0.25, 1], [-5, 4, 5], [0, 0, 0]),
-            createPlatform(20, [1, 1, 1, 1], [0, 0, 0], [0, 0, 0], { stationary : true })
+            createPlatform(15, [0.4, 0.4, 0.4, 1], [0, -11, 0], [0, 0, 0], { stationary : true })
         ];
 
         lines = [
@@ -81,14 +81,16 @@ function drawEntities() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-    var cameraPosition = [0.0, -1, -20.0];
+    var cameraPosition = [0.0, 2, -30.0];
 
     loadIdentity();
     mvTranslate(cameraPosition);
     mvPushMatrix();
+    mvRotate(20, [1, 0, 0]);
+    mvRotate(135, [0, 1, 0]);
 
 
-    var fieldOfView = 75;
+    var fieldOfView = 45;
     var aspectRatio = 16 / 9;
     var minRenderDistance = 0.1;
     var maxRenderDistance = 100;
@@ -135,7 +137,7 @@ function drawEntities() {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
 
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
 
         mvPopMatrix();
     }
