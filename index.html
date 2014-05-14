@@ -9,24 +9,40 @@
 
 <script id="shader-fs" type="x-shader/x-fragment">
   varying lowp vec4 vColor;
+  varying highp vec3 vLighting;
+
+  uniform sampler2D uSampler;
 
   void main(void) {
-    gl_FragColor = vColor;
+    gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
   }
 </script>
 
 <script id="shader-vs" type="x-shader/x-vertex">
-  attribute vec3 aVertexPosition;
+  attribute highp vec3 aVertexNormal;
+  attribute highp vec3 aVertexPosition;
   attribute vec4 aVertexColor;
 
-  uniform mat4 uMVMatrix;
-  uniform mat4 uPMatrix;
+  uniform highp mat4 uNormalMatrix;
+  uniform highp mat4 uMVMatrix;
+  uniform highp mat4 uPMatrix;
 
   varying lowp vec4 vColor;
+  varying highp vec3 vLighting;
 
   void main(void) {
     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
     vColor = aVertexColor;
+
+    // Apply lighting effect
+    highp vec3 ambientLight = vec3(0.25, 0.25, 0.25);
+    highp vec3 directionalLightColor = vec3(1, 1, 1);
+    highp vec3 directionalVector = vec3(0.9, 0.7, 0.5);
+
+    highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+    highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+    vLighting = ambientLight + (directionalLightColor * directional);
   }
 </script>
 

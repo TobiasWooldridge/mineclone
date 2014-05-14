@@ -1,9 +1,8 @@
-function createEntity(vertices, vertexIndices, normals, colors, position, velocity) {
-    var vertexBuffer = createFloat32ArrayBuffer(vertices);
+function createEntity(vertices, vertexIndices, normals, colors, position, velocity, attributes) {
+    var vertexBuffer = createWebGLFloatArrayBuffer(vertices);
     var vertexIndexBuffer = createIndexBuffer(vertexIndices);
-    var normalBuffer = createFloat32ArrayBuffer(normals);
-    var colorBuffer = createFloat32ArrayBuffer(colors);
-
+    var normalBuffer = createWebGLFloatArrayBuffer(normals);
+    var colorBuffer = createWebGLFloatArrayBuffer(colors);
 
     var entity = {
         vertexBuffer : vertexBuffer,
@@ -22,7 +21,8 @@ function createEntity(vertices, vertexIndices, normals, colors, position, veloci
             velocity[0] += gravity[0] * (timestep / 1000);
             velocity[1] += gravity[1] * (timestep / 1000);
             velocity[2] += gravity[2] * (timestep / 1000);
-        }
+        },
+        attributes : attributes || {}
     }
 
     return entity;
@@ -30,12 +30,12 @@ function createEntity(vertices, vertexIndices, normals, colors, position, veloci
 
 function createLine(from, to) {
     return {
-        vertexBuffer : createFloat32ArrayBuffer(from.concat(to)),
+        vertexBuffer : createWebGLFloatArrayBuffer(from.concat(to)),
         indexBuffer : createIndexBuffer([0, 1])
     };
 }
 
-function createFloat32ArrayBuffer(data) {
+function createWebGLFloatArrayBuffer(data) {
     var buffer = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -54,7 +54,31 @@ function createIndexBuffer(data) {
 }
 
 
-function createCube(size, position, velocity) {
+function createPlatform(size, color, position, velocity, attributes) {
+    var vertices = [
+        -1.0, 0, -1.0,
+        1.0, 0, -1.0,
+        1.0, 0, 1.0,
+        -1.0, 0, 1.0
+    ].map(function(x) { return x * size/2; });
+
+    var normals = [
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0
+    ];
+
+    var colors = [color, color, color, color, color, color];
+
+    var cubeVertexIndices = [0, 1, 2, 0, 2, 3];
+
+    debugger;
+
+    return createEntity(vertices, cubeVertexIndices, normals, colors, position, velocity, attributes);
+
+}
+function createCube(size, color, position, velocity, attributes) {
     var vertices = [
         // Front face
         -1.0, -1.0, 1.0,
@@ -91,17 +115,53 @@ function createCube(size, position, velocity) {
         -1.0, -1.0, 1.0,
         -1.0, 1.0, 1.0,
         -1.0, 1.0, -1.0
+    ].map(function(x) { return x * size/2; });
+
+    var normals = [
+        // Front
+        0.0,  0.0,  1.0,
+        0.0,  0.0,  1.0,
+        0.0,  0.0,  1.0,
+        0.0,  0.0,  1.0,
+
+        // Back
+        0.0,  0.0, -1.0,
+        0.0,  0.0, -1.0,
+        0.0,  0.0, -1.0,
+        0.0,  0.0, -1.0,
+
+        // Top
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+
+        // Bottom
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+
+        // Right
+        1.0,  0.0,  0.0,
+        1.0,  0.0,  0.0,
+        1.0,  0.0,  0.0,
+        1.0,  0.0,  0.0,
+
+        // Left
+        -1.0,  0.0,  0.0,
+        -1.0,  0.0,  0.0,
+        -1.0,  0.0,  0.0,
+        -1.0,  0.0,  0.0
     ];
 
-    vertices = vertices.map(function(x) { return x * size/2; });
-
     var colors = [
-        [1.0, 1.0, 1.0, 1.0],    // Front face: white
-        [1.0, 0.0, 0.0, 1.0],    // Back face: red
-        [0.0, 1.0, 0.0, 1.0],    // Top face: green
-        [0.0, 0.0, 1.0, 1.0],    // Bottom face: blue
-        [1.0, 1.0, 0.0, 1.0],    // Right face: yellow
-        [1.0, 0.0, 1.0, 1.0]     // Left face: purple
+        color,    // Front
+        color,    // Back
+        color,    // Top
+        color,    // Bottom
+        color,    // Right
+        color     // Left
     ];
 
     // Convert the array of colors into a table for all the vertices.
@@ -123,10 +183,121 @@ function createCube(size, position, velocity) {
         12, 13, 14,     12, 14, 15,   // bottom
         16, 17, 18,     16, 18, 19,   // right
         20, 21, 22,     20, 22, 23    // left
-    ]
+    ];
 
 
-    return createEntity(vertices, cubeVertexIndices, [], generatedColors, position, velocity);
+    return createEntity(vertices, cubeVertexIndices, normals, generatedColors, position, velocity, attributes);
+}
+
+function createCube(size, color, position, velocity, attributes) {
+    var vertices = [
+        // Front face
+        -1.0, -1.0, 1.0,
+        1.0, -1.0, 1.0,
+        1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
+
+        // Back face
+        -1.0, -1.0, -1.0,
+        -1.0, 1.0, -1.0,
+        1.0, 1.0, -1.0,
+        1.0, -1.0, -1.0,
+
+        // Top face
+        -1.0, 1.0, -1.0,
+        -1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, -1.0,
+
+        // Bottom face
+        -1.0, -1.0, -1.0,
+        1.0, -1.0, -1.0,
+        1.0, -1.0, 1.0,
+        -1.0, -1.0, 1.0,
+
+        // Right face
+        1.0, -1.0, -1.0,
+        1.0, 1.0, -1.0,
+        1.0, 1.0, 1.0,
+        1.0, -1.0, 1.0,
+
+        // Left face
+        -1.0, -1.0, -1.0,
+        -1.0, -1.0, 1.0,
+        -1.0, 1.0, 1.0,
+        -1.0, 1.0, -1.0
+    ].map(function(x) { return x * size/2; });
+
+    var normals = [
+        // Front
+        0.0,  0.0,  1.0,
+        0.0,  0.0,  1.0,
+        0.0,  0.0,  1.0,
+        0.0,  0.0,  1.0,
+
+        // Back
+        0.0,  0.0, -1.0,
+        0.0,  0.0, -1.0,
+        0.0,  0.0, -1.0,
+        0.0,  0.0, -1.0,
+
+        // Top
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+
+        // Bottom
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+
+        // Right
+        1.0,  0.0,  0.0,
+        1.0,  0.0,  0.0,
+        1.0,  0.0,  0.0,
+        1.0,  0.0,  0.0,
+
+        // Left
+        -1.0,  0.0,  0.0,
+        -1.0,  0.0,  0.0,
+        -1.0,  0.0,  0.0,
+        -1.0,  0.0,  0.0
+    ];
+
+    var colors = [
+        color,    // Front
+        color,    // Back
+        color,    // Top
+        color,    // Bottom
+        color,    // Right
+        color     // Left
+    ];
+
+    // Convert the array of colors into a table for all the vertices.
+    var generatedColors = [];
+
+    for (var j = 0; j < 6; j++) {
+        var c = colors[j];
+
+        // Repeat each color four times for the four vertices of the face
+        for (var i = 0; i < 4; i++) {
+            generatedColors = generatedColors.concat(c);
+        }
+    }
+
+    var cubeVertexIndices = [
+        0,  1,  2,      0,  2,  3,    // front
+        4,  5,  6,      4,  6,  7,    // back
+        8,  9,  10,     8,  10, 11,   // top
+        12, 13, 14,     12, 14, 15,   // bottom
+        16, 17, 18,     16, 18, 19,   // right
+        20, 21, 22,     20, 22, 23    // left
+    ];
+
+
+    return createEntity(vertices, cubeVertexIndices, normals, generatedColors, position, velocity, attributes);
 }
 
 
@@ -180,7 +351,7 @@ function createSphere(radius, color, position, velocity) {
 
     var colorData = [];
     for (var i = 0; i < indexData.length; i++) {
-        colorData.push(color[0], color[1], color[2], color[3]);
+        colorData.push(color);
     }
 
     return createEntity(vertexPositionData, indexData, normalData, colorData, position, velocity);

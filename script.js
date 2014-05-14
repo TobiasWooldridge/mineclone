@@ -4,6 +4,7 @@ var gl;
 var mvMatrix;
 var shaderProgram;
 var vertexPositionAttribute;
+var vertexNormalAttribute;
 var vertexColorAttribute;
 var perspectiveMatrix;
 
@@ -28,30 +29,31 @@ function start() {
         initShaders();
 
         entities = [
-            createSphere(10, [1, 1, 1, 1], [5, 0, -5], [0, 0, 0])
-//            ,
-//            createCube(2, [0, 0, 0], [0, 0, 0]),
-//            createCube(2, [-5, 0, 5], [0, 0, 0])
+//            createSphere(10, [1, 1, 1, 1], [5, 0, -5], [0, 0, 0]),
+            createCube(2, [0.25, 0.25, 1, 1], [5, 10, -5], [0, 0, 0]),
+            createCube(2, [0.25, 1, 0.25, 1], [0, 7, 0], [0, 0, 0]),
+            createCube(2, [1, 0.25, 0.25, 1], [-5, 4, 5], [0, 0, 0]),
+            createPlatform(20, [1, 1, 1, 1], [0, 0, 0], [0, 0, 0], { stationary : true })
         ];
 
         lines = [
-            // Bottom side
-            createLine([10, -10, 10], [10,  -10, -10]),
-            createLine([10, -10, 10], [-10,  -10, 10]),
-            createLine([-10, -10, -10], [10,  -10, -10]),
-            createLine([-10, -10, -10], [-10,  -10, 10]),
-
-            // Top side
-            createLine([10, 10, 10], [10,  10, -10]),
-            createLine([10, 10, 10], [-10,  10, 10]),
-            createLine([-10, 10, -10], [10,  10, -10]),
-            createLine([-10, 10, -10], [-10,  10, 10]),
-
-            // Remaining edges
-            createLine([10, 10, 10], [10,  -10, 10]),
-            createLine([10, 10, -10], [10,  -10, -10]),
-            createLine([-10, 10, 10], [-10,  -10, 10]),
-            createLine([-10, 10, -10], [-10,  -10, -10])
+//            // Bottom side
+//            createLine([10, -10, 10], [10,  -10, -10]),
+//            createLine([10, -10, 10], [-10,  -10, 10]),
+//            createLine([-10, -10, -10], [10,  -10, -10]),
+//            createLine([-10, -10, -10], [-10,  -10, 10]),
+//
+//            // Top side
+//            createLine([10, 10, 10], [10,  10, -10]),
+//            createLine([10, 10, 10], [-10,  10, 10]),
+//            createLine([-10, 10, -10], [10,  10, -10]),
+//            createLine([-10, 10, -10], [-10,  10, 10]),
+//
+//            // Remaining edges
+//            createLine([10, 10, 10], [10,  -10, 10]),
+//            createLine([10, 10, -10], [10,  -10, -10]),
+//            createLine([-10, 10, 10], [-10,  -10, 10]),
+//            createLine([-10, 10, -10], [-10,  -10, -10])
         ];
 
         setInterval(drawEntities, 1000 / 75);
@@ -79,14 +81,14 @@ function drawEntities() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-    var cameraPosition = [0.0, 0, -35.0];
+    var cameraPosition = [0.0, -1, -20.0];
 
     loadIdentity();
     mvTranslate(cameraPosition);
     mvPushMatrix();
 
 
-    var fieldOfView = 45;
+    var fieldOfView = 75;
     var aspectRatio = 16 / 9;
     var minRenderDistance = 0.1;
     var maxRenderDistance = 100;
@@ -107,18 +109,19 @@ function drawEntities() {
 
         var entity = entities[entityIndex];
 
-        entity.accelerate(gravity, timeDelta);
-        entity.move(timeDelta);
+        if (!entity.attributes.stationary) {
+            entity.accelerate(gravity, timeDelta);
+            entity.move(timeDelta);
 
-        mvTranslate(entity.position);
-
-        for (var i = 0; i < 3; i++)
-        {
-            if (entity.position[i] < -10 || entity.position[i] > 10) {
-                entity.position[i] = Math.max(-10, Math.min(entity.position[i], 10));
-                entity.velocity[i] *= -1;
+            for (var i = 0; i < 3; i++) {
+                if (entity.position[i] < -10 || entity.position[i] > 10) {
+                    entity.position[i] = Math.max(-10, Math.min(entity.position[i], 10));
+                    entity.velocity[i] *= -1;
+                }
             }
         }
+
+        mvTranslate(entity.position);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
         gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
@@ -127,7 +130,7 @@ function drawEntities() {
         gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
 
@@ -183,6 +186,9 @@ function initShaders() {
 
     vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
     gl.enableVertexAttribArray(vertexPositionAttribute);
+
+    vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+    gl.enableVertexAttribArray(vertexNormalAttribute);
 
     vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
     gl.enableVertexAttribArray(vertexColorAttribute);
@@ -263,6 +269,11 @@ function setMatrixUniforms() {
 
     var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     gl.uniformMatrix4fv(mvUniform, false, new Float32Array(mvMatrix.flatten()));
+
+    var normalMatrix = mvMatrix.inverse();
+    normalMatrix = normalMatrix.transpose();
+    var nUniform = gl.getUniformLocation(shaderProgram, "uNormalMatrix");
+    gl.uniformMatrix4fv(nUniform, false, new Float32Array(normalMatrix.flatten()));
 }
 
 var mvMatrixStack = [];
