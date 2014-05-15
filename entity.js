@@ -198,8 +198,6 @@ function createCube(size, color, position, velocity, attributes) {
         colors.push(color[0], color[1], color[2], color[3]);
     }
 
-
-
     return createEntity(vertices, vertexIndices, normals, colors, position, velocity, attributes);
 }
 
