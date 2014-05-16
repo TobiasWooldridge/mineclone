@@ -24,7 +24,7 @@ function createModel(name, vertices, vertexIndices, vertexNormals, colors) {
 
         for (var j = 0; j < numTriangles; j++) {
             // Repeat each color four times for the four vertices of the face
-            colors.push(1, 1, 1, 1);
+            colors.push(1, 0, 0, 1);
         }
     }
 
