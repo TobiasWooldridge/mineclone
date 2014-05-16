@@ -1,15 +1,65 @@
-function createEntity(vertices, vertexIndices, normals, colors, position, velocity, attributes) {
-    var vertexBuffer = createWebGLFloatArrayBuffer(vertices);
-    var vertexIndexBuffer = createIndexBuffer(vertexIndices);
-    var normalBuffer = createWebGLFloatArrayBuffer(normals);
-    var colorBuffer = createWebGLFloatArrayBuffer(colors);
+function lintModel(model) {
+    // Check all vertex indices are valid
+    for (var i = 0; i < model.vertexIndices.length; i++) {
+        var vertexIndex = model.vertexIndices[i];
+        if (model.vertices[vertexIndex] === undefined) {
+            throw ("Illegal vertex index (" + vertexIndex + ")");
+        }
+    }
+
+
+    // Check there is the correct number of colors specified
+    if (model.vertices.length != model.vertexNormals.length) {
+        throw ("Illegal number of vertex normals for model", model);
+    }
+
+    return model;
+}
+
+function createModel(name, vertices, vertexIndices, vertexNormals, colors) {
+    var numTriangles = vertexIndices.length/3;
+
+    if (colors == undefined) {
+        colors = [];
+
+        for (var j = 0; j < numTriangles; j++) {
+            // Repeat each color four times for the four vertices of the face
+            colors.push(1, 1, 1, 1);
+        }
+    }
+
+    var model = {
+        name : name,
+        vertices : vertices,
+        vertexIndices : vertexIndices,
+        vertexNormals : vertexNormals,
+        vertexColors : colors,
+        numTriangles : numTriangles
+    };
+
+    lintModel(model);
+
+    return model;
+}
+
+
+function createEntity(model, position, velocity, attributes) {
+    position = position || [0, 0, 0];
+    velocity = velocity || [0, 0, 0];
+    attributes = attributes || {};
+
+    var vertexBuffer = createWebGLFloatArrayBuffer(model.vertices);
+    var vertexIndexBuffer = createIndexBuffer(model.vertexIndices);
+    var normalBuffer = createWebGLFloatArrayBuffer(model.vertexNormals);
+    var colorBuffer = createWebGLFloatArrayBuffer(model.vertexColors);
 
     var entity = {
+        model : model,
         vertexBuffer : vertexBuffer,
         vertexIndexBuffer : vertexIndexBuffer,
         normalBuffer : normalBuffer,
         colorBuffer : colorBuffer,
-        triangles : vertexIndices.length/3,
+        triangles : model.numTriangles,
         position : position,
         velocity : velocity,
         move : function move (timestep) {
@@ -22,7 +72,7 @@ function createEntity(vertices, vertexIndices, normals, colors, position, veloci
             velocity[1] += gravity[1] * (timestep / 1000);
             velocity[2] += gravity[2] * (timestep / 1000);
         },
-        attributes : attributes || {}
+        attributes : attributes
     }
 
     return entity;
@@ -71,28 +121,17 @@ function createPlatform(size, color, position, velocity, attributes) {
         0.0,  1.0,  0.0
     ];
 
-    var colors = [
-        color    // Front
-    ];
-
-    // Convert the array of colors into a table for all the vertices.
-    var generatedColors = [];
-
-    for (var j = 0; j < 1; j++) {
-        var c = colors[j];
-
-        // Repeat each color four times for the four vertices of the face
-        for (var i = 0; i < 4; i++) {
-            generatedColors = generatedColors.concat(c);
-        }
+    var colors = [];
+    for (var i = 0; i < vertices.length; i++) {
+        colors = colors.concat(color);
     }
 
     var vertexIndices = [
-        0,  1,  2,      0,  2,  3    // front
+        0,  1,  2, 0,  2,  3
     ];
 
 
-    return createEntity(vertices, vertexIndices, normals, generatedColors, position, velocity, attributes);
+    return createEntity(createModel("Plane", vertices, vertexIndices, normals, colors), position, velocity, attributes);
 }
 
 function createCube(size, color, position, velocity, attributes) {
@@ -190,15 +229,12 @@ function createCube(size, color, position, velocity, attributes) {
         20, 21, 22,     20, 22, 23    // left
     ];
 
-    // Convert the array of colors into a table for all the vertices.
     var colors = [];
-
     for (var j = 0; j < vertexIndices.length; j++) {
-        // Repeat each color four times for the four vertices of the face
         colors.push(color[0], color[1], color[2], color[3]);
     }
 
-    return createEntity(vertices, vertexIndices, normals, colors, position, velocity, attributes);
+    return createEntity(createModel("Cube", vertices, vertexIndices, normals, colors), position, velocity, attributes);
 }
 
 
@@ -257,5 +293,5 @@ function createSphere(diameter, color, position, velocity, attributes) {
         colors.push(color[0], color[1], color[2], color[3]);
     }
 
-    return createEntity(vertices, vertexIndices, normals, colors, position, velocity, attributes);
+    return createEntity(createModel("Sphere", vertices, vertexIndices, normals, colors), position, velocity, attributes);
 }

@@ -13,9 +13,9 @@ var lastUpdateTime = 0;
 var entities;
 var lines;
 
-var gravity = [0, -10, 0];
+var gravity = [0, -20, 0];
 
-function start() {
+function start(models) {
     canvas = document.getElementById("glcanvas");
 
     initWebGL(canvas);
@@ -29,11 +29,17 @@ function start() {
         initShaders();
 
         entities = [
+            createCube(2, [1, 0.25, 0.25, 1], [-5, 5, 5], [0, 0, 0]),
             createSphere(2, [0.25, 0.25, 1, 1], [5, 5, -5], [0, 0, 0]),
             createSphere(2, [0.25, 1, 0.25, 1], [0, 2, 0], [0, 0, 0]),
-            createCube(2, [1, 0.25, 0.25, 1], [-5, 5, 5], [0, 0, 0]),
             createPlatform(15, [0.4, 0.4, 0.4, 1], [0, -11, 0], [0, 0, 0], { stationary : true })
         ];
+
+        for (var i = 0; i < models.length; i++) {
+            var model = models[i];
+            console.log(model);
+            entities.push(createEntity(model));
+        }
 
         lines = [
 //            // Bottom side
@@ -63,9 +69,7 @@ function initWebGL() {
     gl = null;
 
     try {
-        gl = canvas.getContext("webgl", {antialias:true});
-
-        console.log(gl.getContextAttributes().antialias);
+        gl = canvas.getContext("webgl", { antialias: true });
     }
     catch (e) {
     }
@@ -78,6 +82,12 @@ function initWebGL() {
 
 var angle = 20;
 function drawEntities() {
+
+    var currentTime = (new Date).getTime();
+    var timeDelta = Math.min(currentTime - lastUpdateTime, 1000/20);
+    lastUpdateTime = currentTime;
+
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
@@ -95,15 +105,6 @@ function drawEntities() {
     var minRenderDistance = 0.1;
     var maxRenderDistance = 100;
     perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
-
-
-    var currentTime = (new Date).getTime();
-    var timeDelta = currentTime - lastUpdateTime;
-    lastUpdateTime = currentTime;
-
-    if (timeDelta == currentTime) {
-        return;
-    }
 
     // Draw all entities
     for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
