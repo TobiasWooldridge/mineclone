@@ -1,4 +1,4 @@
-function lintModel(model) {
+function verifyModel(model) {
     // Check all vertex indices are valid
     for (var i = 0; i < model.vertexIndices.length; i++) {
         var vertexIndex = model.vertexIndices[i];
@@ -16,28 +16,69 @@ function lintModel(model) {
     return model;
 }
 
+function createNormals(model) {
+    if (model.vertexNormals.length > 0) {
+        return;
+    }
+
+    var normalsByIndex = [];
+
+    // Calculate every normal value for each vertex
+    for (var i = 0; i < model.vertexIndices.length; i += 3) {
+        var triangleIndices = model.vertexIndices.slice(i, i + 3);
+        var vertices = triangleIndices.map(function(x) { return getVertex(model.vertices, x); });
+
+        var normal = calculateNormal(vertices[0], vertices[1], vertices[2]);
+
+        for (var v = 0; v < 3; v++) {
+            normalsByIndex[triangleIndices[v]] = normalsByIndex[triangleIndices[v]] || [];
+            normalsByIndex[triangleIndices[v]].push(normal);
+        }
+    }
+
+    for (var i = 0; i < model.vertices.length/3; i ++) {
+        var normal = [0, 0, 0];
+        for (var j = 0; j < normalsByIndex[i].length; j++) {
+            normal[0] += normalsByIndex[i][j][0];
+            normal[1] += normalsByIndex[i][j][1];
+            normal[2] += normalsByIndex[i][j][2];
+        }
+
+        normal = normalize(normal);
+
+        model.vertexNormals.push(normal[0]);
+        model.vertexNormals.push(normal[1]);
+        model.vertexNormals.push(normal[2]);
+    }
+
+    console.log(model.vertexNormals);
+
+}
+
 function createModel(name, vertices, vertexIndices, vertexNormals, colors) {
-    var numTriangles = vertexIndices.length/3;
+    var numTriangles = vertexIndices.length / 3;
 
     if (colors == undefined) {
         colors = [];
 
         for (var j = 0; j < numTriangles; j++) {
-            // Repeat each color four times for the four vertices of the face
-            colors.push(1, 0, 0, 1);
+            colors.push(1, 1, 1, 1);
         }
     }
 
     var model = {
-        name : name,
-        vertices : vertices,
-        vertexIndices : vertexIndices,
-        vertexNormals : vertexNormals,
-        vertexColors : colors,
-        numTriangles : numTriangles
+        name: name,
+        vertices: vertices,
+        vertexIndices: vertexIndices,
+        vertexNormals: vertexNormals,
+        vertexColors: colors,
+        numTriangles: numTriangles
     };
 
-    lintModel(model);
+
+    createNormals(model);
+
+    verifyModel(model);
 
     return model;
 }
@@ -54,25 +95,25 @@ function createEntity(model, position, velocity, attributes) {
     var colorBuffer = createWebGLFloatArrayBuffer(model.vertexColors);
 
     var entity = {
-        model : model,
-        vertexBuffer : vertexBuffer,
-        vertexIndexBuffer : vertexIndexBuffer,
-        normalBuffer : normalBuffer,
-        colorBuffer : colorBuffer,
-        triangles : model.numTriangles,
-        position : position,
-        velocity : velocity,
-        move : function move (timestep) {
+        model: model,
+        vertexBuffer: vertexBuffer,
+        vertexIndexBuffer: vertexIndexBuffer,
+        normalBuffer: normalBuffer,
+        colorBuffer: colorBuffer,
+        triangles: model.numTriangles,
+        position: position,
+        velocity: velocity,
+        move: function move(timestep) {
             position[0] += velocity[0] * (timestep / 1000);
             position[1] += velocity[1] * (timestep / 1000);
             position[2] += velocity[2] * (timestep / 1000);
         },
-        accelerate : function accelerate (gravity, timestep) {
+        accelerate: function accelerate(gravity, timestep) {
             velocity[0] += gravity[0] * (timestep / 1000);
             velocity[1] += gravity[1] * (timestep / 1000);
             velocity[2] += gravity[2] * (timestep / 1000);
         },
-        attributes : attributes
+        attributes: attributes
     }
 
     return entity;
@@ -80,8 +121,8 @@ function createEntity(model, position, velocity, attributes) {
 
 function createLine(from, to) {
     return {
-        vertexBuffer : createWebGLFloatArrayBuffer(from.concat(to)),
-        indexBuffer : createIndexBuffer([0, 1])
+        vertexBuffer: createWebGLFloatArrayBuffer(from.concat(to)),
+        indexBuffer: createIndexBuffer([0, 1])
     };
 }
 
@@ -111,14 +152,16 @@ function createPlatform(size, color, position, velocity, attributes) {
         -1.0, 0.0, 1.0,
         1.0, 0.0, 1.0,
         1.0, 0.0, -1.0
-    ].map(function(x) { return x * size/2; });
+    ].map(function (x) {
+            return x * size / 2;
+        });
 
     var normals = [
         // Top
-        0.0,  1.0,  0.0,
-        0.0,  1.0,  0.0,
-        0.0,  1.0,  0.0,
-        0.0,  1.0,  0.0
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0
     ];
 
     var colors = [];
@@ -127,7 +170,7 @@ function createPlatform(size, color, position, velocity, attributes) {
     }
 
     var vertexIndices = [
-        0,  1,  2, 0,  2,  3
+        0, 1, 2, 0, 2, 3
     ];
 
 
@@ -171,44 +214,46 @@ function createCube(size, color, position, velocity, attributes) {
         -1.0, -1.0, 1.0,
         -1.0, 1.0, 1.0,
         -1.0, 1.0, -1.0
-    ].map(function(x) { return x * size/2; });
+    ].map(function (x) {
+            return x * size / 2;
+        });
 
     var normals = [
         // Front
-        0.0,  0.0,  1.0,
-        0.0,  0.0,  1.0,
-        0.0,  0.0,  1.0,
-        0.0,  0.0,  1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
 
         // Back
-        0.0,  0.0, -1.0,
-        0.0,  0.0, -1.0,
-        0.0,  0.0, -1.0,
-        0.0,  0.0, -1.0,
+        0.0, 0.0, -1.0,
+        0.0, 0.0, -1.0,
+        0.0, 0.0, -1.0,
+        0.0, 0.0, -1.0,
 
         // Top
-        0.0,  1.0,  0.0,
-        0.0,  1.0,  0.0,
-        0.0,  1.0,  0.0,
-        0.0,  1.0,  0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
 
         // Bottom
-        0.0, -1.0,  0.0,
-        0.0, -1.0,  0.0,
-        0.0, -1.0,  0.0,
-        0.0, -1.0,  0.0,
+        0.0, -1.0, 0.0,
+        0.0, -1.0, 0.0,
+        0.0, -1.0, 0.0,
+        0.0, -1.0, 0.0,
 
         // Right
-        1.0,  0.0,  0.0,
-        1.0,  0.0,  0.0,
-        1.0,  0.0,  0.0,
-        1.0,  0.0,  0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
 
         // Left
-        -1.0,  0.0,  0.0,
-        -1.0,  0.0,  0.0,
-        -1.0,  0.0,  0.0,
-        -1.0,  0.0,  0.0
+        -1.0, 0.0, 0.0,
+        -1.0, 0.0, 0.0,
+        -1.0, 0.0, 0.0,
+        -1.0, 0.0, 0.0
     ];
 
     var colors = [
@@ -221,12 +266,12 @@ function createCube(size, color, position, velocity, attributes) {
     ];
 
     var vertexIndices = [
-        0,  1,  2,      0,  2,  3,    // front
-        4,  5,  6,      4,  6,  7,    // back
-        8,  9,  10,     8,  10, 11,   // top
-        12, 13, 14,     12, 14, 15,   // bottom
-        16, 17, 18,     16, 18, 19,   // right
-        20, 21, 22,     20, 22, 23    // left
+        0, 1, 2, 0, 2, 3,    // front
+        4, 5, 6, 4, 6, 7,    // back
+        8, 9, 10, 8, 10, 11,   // top
+        12, 13, 14, 12, 14, 15,   // bottom
+        16, 17, 18, 16, 18, 19,   // right
+        20, 21, 22, 20, 22, 23    // left
     ];
 
     var colors = [];
@@ -240,18 +285,18 @@ function createCube(size, color, position, velocity, attributes) {
 
 function createSphere(diameter, color, position, velocity, attributes) {
     // Taken from http://learningwebgl.com/lessons/lesson11/index.html
-    var radius = diameter/2;
+    var radius = diameter / 2;
     var latitudeBands = 20;
     var longitudeBands = 20;
 
     var vertices = [];
     var normals = [];
-    for (var latNumber=0; latNumber <= latitudeBands; latNumber++) {
+    for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
         var theta = latNumber * Math.PI / latitudeBands;
         var sinTheta = Math.sin(theta);
         var cosTheta = Math.cos(theta);
 
-        for (var longNumber=0; longNumber <= longitudeBands; longNumber++) {
+        for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
             var phi = longNumber * 2 * Math.PI / longitudeBands;
             var sinPhi = Math.sin(phi);
             var cosPhi = Math.cos(phi);
@@ -273,8 +318,8 @@ function createSphere(diameter, color, position, velocity, attributes) {
     }
 
     var vertexIndices = [];
-    for (var latNumber=0; latNumber < latitudeBands; latNumber++) {
-        for (var longNumber=0; longNumber < longitudeBands; longNumber++) {
+    for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
+        for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
             var first = (latNumber * (longitudeBands + 1)) + longNumber;
             var second = first + longitudeBands + 1;
             vertexIndices.push(first);
@@ -286,7 +331,6 @@ function createSphere(diameter, color, position, velocity, attributes) {
             vertexIndices.push(first + 1);
         }
     }
-
 
     var colors = [];
     for (var i = 0; i < vertexIndices.length; i++) {

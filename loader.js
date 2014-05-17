@@ -11,8 +11,11 @@ function request(method, address, callback) {
     xhr.send();
 }
 
+function getVertex(vertices, index) {
+    return vertices.slice(index * 3, (index + 1) * 3);
+}
 
-function loadModel(objFile) {
+function parseObj(objFile) {
     var vertices = [], vertexNormals = [], vertexIndices = [];
 
     var buffersByLabels = {
@@ -45,21 +48,18 @@ function loadModel(objFile) {
 
     vertexIndices = vertexIndices.map(function (x) { return x - 1; });
 
-    for (var i = 0; i < vertices.length; i++) {
-        vertexNormals.push(vertices[i]);
-    }
-
-
     vertices = vertices.map(function (x) { return x * 0.5; } );
 
-    return createModel("Bunny", vertices, vertexIndices, vertexNormals);
+    var model = createModel("Bunny", vertices, vertexIndices, vertexNormals);
+
+    return model;
 }
 
 
 
 function onLoad() {
     request('GET', './objects/bunny.obj', function (xhr) {
-        var model = loadModel(xhr.responseText);
+        var model = parseObj(xhr.responseText);
         start({ 'bunny' : model });
     });
 }
