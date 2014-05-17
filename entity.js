@@ -50,9 +50,6 @@ function createNormals(model) {
         model.vertexNormals.push(normal[1]);
         model.vertexNormals.push(normal[2]);
     }
-
-    console.log(model.vertexNormals);
-
 }
 
 function createModel(name, vertices, vertexIndices, vertexNormals, colors) {
