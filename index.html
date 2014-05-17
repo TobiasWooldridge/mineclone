@@ -18,14 +18,60 @@
   }
 </script>
 
+<script id="shader-fs2" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4 vColor;
+varying vec3 normalInterp;
+varying vec3 vertPos;
+
+uniform int mode;
+
+const vec3 lightPos = vec3(1.0,1.0,1.0);
+vec3 ambientColor = vec3(vColor[0] * 0.2, vColor[1] * 0.2, vColor[2] * 0.2);
+vec3 diffuseColor = vec3(vColor[0] * 0.7, vColor[1] * 0.7, vColor[2] * 0.7);
+const vec3 specColor = vec3(1.0, 1.0, 1.0);
+
+void main() {
+
+  vec3 normal = normalize(normalInterp);
+  vec3 lightDir = normalize(lightPos - vertPos);
+
+  float lambertian = max(dot(lightDir,normal), 0.0);
+  float specular = 0.0;
+
+  if(lambertian > 0.0) {
+
+    vec3 viewDir = normalize(-vertPos);
+
+    // this is blinn phong
+    vec3 halfDir = normalize(lightDir + viewDir);
+    float specAngle = max(dot(halfDir, normal), 0.0);
+    specular = pow(specAngle, 16.0);
+
+    // this is phong (for comparison)
+    if(mode == 2) {
+      vec3 reflectDir = reflect(-lightDir, normal);
+      specAngle = max(dot(reflectDir, viewDir), 0.0);
+      // note that the exponent is different here
+      specular = pow(specAngle, 4.0);
+    }
+  }
+
+  gl_FragColor = vec4(ambientColor +
+                      lambertian * diffuseColor +
+                      specular * specColor, 1.0);
+}
+</script>
+
 <script id="shader-vs" type="x-shader/x-vertex">
   attribute highp vec3 aVertexNormal;
   attribute highp vec3 aVertexPosition;
   attribute vec4 aVertexColor;
 
-  uniform highp mat4 uNormalMatrix;
   uniform highp mat4 uMVMatrix;
   uniform highp mat4 uPMatrix;
+  uniform highp mat4 uNormalMatrix;
 
   varying lowp vec4 vColor;
   varying highp vec3 vLighting;
@@ -44,6 +90,29 @@
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
     vLighting = ambientLight + (directionalLightColor * directional);
   }
+</script>
+<script id="shader-vs2" type="x-shader/x-vertex">
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
+
+uniform mat4 uPMatrix, uMVMatrix, uNormalMatrix;
+
+varying lowp vec4 vColor;
+varying vec3 normalInterp;
+varying vec3 vertPos;
+
+void main(){
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+    vColor = aVertexColor;
+
+    vec4 vertPos4 = uMVMatrix * vec4(aVertexPosition, 1.0);
+    vertPos = vec3(vertPos4) / vertPos4.w;
+
+    normalInterp = vec3(uNormalMatrix * vec4(aVertexNormal, 0.0));
+}
+
 </script>
 
 <body onload="onLoad()">

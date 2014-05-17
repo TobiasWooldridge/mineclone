@@ -16,11 +16,12 @@ function getVertex(vertices, index) {
 }
 
 function parseObj(objFile) {
-    var vertices = [], vertexNormals = [], vertexIndices = [];
+    var vertices = [], vertexNormals = [], vertexIndices = [], vertexTextures;
 
     var buffersByLabels = {
         v : vertices,
         vn : vertexNormals,
+        vt : vertexTextures,
         f : vertexIndices
     }
 
