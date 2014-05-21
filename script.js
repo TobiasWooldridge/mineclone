@@ -30,7 +30,6 @@ function start(models) {
 
         entities = [
             createCube(2, [1, 0.25, 0.25, 1], [-5, 5, 5], [0, 0, 0]),
-//            createSphere(2, [0.25, 1, 0.25, 1], [0, 2, 0], [0, 0, 0]),
             createEntity(models.bunny, [0, 5, 0]),
             createSphere(2.5, [0.25, 0.25, 1, 1], [5, 5, -5], [0, 0, 0]),
             createPlatform(100, [0.4, 1, 0.4, 1], [0, -11, 0], [0, 0, 0], { stationary : true })

@@ -27,7 +27,9 @@ function parseObj(objFile) {
 
     var lines = objFile.split("\n");
 
-    var vectorExp = /([a-z]+)\s+([\-0-9\.]+)\s+([\-0-9\.]+)\s+([\-0-9\.]+)/ig;
+    var a = /(?:\/.+)?/
+
+    var vectorExp = /([a-z]+)\s+([\-0-9\.]+)(?:\/.+)?\s+([\-0-9\.]+)(?:\/.+)?\s+([\-0-9\.]+)(?:\/.+)?/ig;
 
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
@@ -49,7 +51,7 @@ function parseObj(objFile) {
 
     vertexIndices = vertexIndices.map(function (x) { return x - 1; });
 
-    vertices = vertices.map(function (x) { return x * 0.5; } );
+    vertices = vertices.map(function (x) { return x * 0.25; } );
 
     var model = createModel("Bunny", vertices, vertexIndices, vertexNormals);
 
