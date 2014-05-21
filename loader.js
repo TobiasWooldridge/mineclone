@@ -16,7 +16,7 @@ function getVertex(vertices, index) {
 }
 
 function parseObj(objFile) {
-    var vertices = [], vertexNormals = [], vertexIndices = [], vertexTextures;
+    var vertices = [], vertexNormals = [], vertexIndices = [], vertexTextures = [];
 
     var buffersByLabels = {
         v : vertices,
@@ -53,7 +53,7 @@ function parseObj(objFile) {
 
     vertices = vertices.map(function (x) { return x * 0.25; } );
 
-    var model = createModel("Bunny", vertices, vertexIndices, vertexNormals);
+    var model = createModel("Teapot", vertices, vertexIndices, vertexNormals);
 
     return model;
 }
@@ -63,6 +63,6 @@ function parseObj(objFile) {
 function onLoad() {
     request('GET', './objects/teapot.obj', function (xhr) {
         var model = parseObj(xhr.responseText);
-        start({ 'bunny' : model });
+        start({ 'teapot' : model });
     });
 }
