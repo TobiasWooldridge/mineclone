@@ -8,17 +8,6 @@ function vectorDifference(a, b) {
     return c;
 }
 
-
-
-//Set Vector U to (Triangle.p2 minus Triangle.p1)
-//Set Vector V to (Triangle.p3 minus Triangle.p1)
-//
-//Set Normal.x to (multiply u[1] by v[2]) minus (multiply u[2] by v[1])
-//Set Normal.y to (multiply u[2] by v[0]) minus (multiply u[0] by v[2])
-//Set Normal.z to (multiply u[0] by v[1]) minus (multiply u[1] by v[0])
-
-
-
 function magnitude(v) {
     return v.reduce(function(x, y) { return x + y});
 }
@@ -39,9 +28,5 @@ function calculateNormal(a, b, c) {
         (u[0] * v[1]) - (u[1] * v[0])
     ];
 
-    normal = normalize(normal);
-
-    normal = normal.map(function(x) { return x * -1 });
-
-    return normal;
+    return normalize(normal);
 }
