@@ -14,42 +14,23 @@ function verifyModel(model) {
     }
 
     // Check there is the correct number of colors specified
-    if (model.numVertices != model.vertexColors.length / 4) {
-        throw ("Illegal number of colors for model", model);
+    if (model.vertices.length/3 != model.vertexTextureCoords.length/2) {
+        throw ("Illegal number of texture coords for model", model);
     }
 
     return model;
 }
 
-function createModel(name, vertices, vertexIndices, vertexNormals, colors) {
+function createModel(name, vertices, vertexIndices, vertexNormals, vertexTextureCoords) {
     var numTriangles = vertexIndices.length / 3;
     var numVertices = vertices.length / 3;
-
-    // Use all-white colors if no colours are defined
-    if (colors == undefined) {
-        colors = [];
-
-        for (var j = 0; j < numVertices; j++) {
-            _.push4(colors, palette.white);
-        }
-    }
-    else if (colors.length == 4) {
-        var color = colors;
-        colors = [];
-
-        for (var j = 0; j < numVertices; j++) {
-            _.push4(colors, color);
-        }
-    }
-
-    console.log(name, colors);
 
     var model = {
         name: name,
         vertices: vertices,
         vertexIndices: vertexIndices,
         vertexNormals: vertexNormals,
-        vertexColors: colors,
+        vertexTextureCoords: vertexTextureCoords,
         numTriangles: numTriangles,
         numVertices: numVertices
     };

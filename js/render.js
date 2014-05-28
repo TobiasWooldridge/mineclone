@@ -8,7 +8,7 @@ var renderer = (function () {
     var shaderProgram;
     var vertexPositionAttribute;
     var vertexNormalAttribute;
-    var vertexColorAttribute;
+    var textureCoordAttribute;
     var perspectiveMatrix;
 
     var lastUpdateTime = 0;
@@ -88,9 +88,13 @@ var renderer = (function () {
             gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
             gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, entity.colorBuffer);
-            gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
+            gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 
+            // Set the texture
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, textures["stone"]);
+            gl.uniform1i(shaderProgram.samplerUniform, 0);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
 
@@ -149,15 +153,14 @@ var renderer = (function () {
         vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
         gl.enableVertexAttribArray(vertexNormalAttribute);
 
-        vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
-        gl.enableVertexAttribArray(vertexColorAttribute);
+        textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(textureCoordAttribute);
     }
 
     function getShader(gl, id) {
         var shaderScript = document.getElementById(id);
 
         // Didn't find an element with the specified ID; abort.
-
         if (!shaderScript) {
             return null;
         }
@@ -189,11 +192,9 @@ var renderer = (function () {
         }
 
         // Send the source to the shader object
-
         gl.shaderSource(shader, theSource);
 
         // Compile the shader program
-
         gl.compileShader(shader);
 
         // See if it compiled successfully
@@ -216,20 +217,19 @@ var renderer = (function () {
             texture.image = images[imageName];
 
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[imageName]);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
             gl.bindTexture(gl.TEXTURE_2D, null);
 
             textures[imageName] = texture;
         }
     }
 
-
-//
-// Matrix utility functions
-//
+    //
+    // Matrix utility functions
+    //
 
     function loadIdentity() {
         mvMatrix = Matrix.I(4);
@@ -298,10 +298,10 @@ var renderer = (function () {
         initTextures(images);
 
         entities = [
-            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
-            createEntity(models.teapot, [0, 5, 0]),
-            createSphere(2.5, palette.blue, [5, 5, -5], [0, 0, 0]),
-            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
+//            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
+            createScaledEntity(4, models.cube, [0, 5, 0])
+//            createSphere(2.5, palette.blue, [5, 5, -5], [0, 0, 0]),
+//            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
         ];
 
         lines = [];

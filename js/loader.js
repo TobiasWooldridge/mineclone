@@ -15,12 +15,12 @@ var loader = (function () {
     var getResource = _.curry(request, ['GET']);
 
     function parseObj(objFile) {
-        var vertices = [], vertexNormals = [], vertexIndices = [], vertexTextures;
+        var vertices = [], vertexNormals = [], vertexIndices = [], vertexTextureCoords = [];
 
         var buffersByLabels = {
             v: vertices,
             vn: vertexNormals,
-            vt: vertexTextures,
+            vt: vertexTextureCoords,
             f: vertexIndices
         }
 
@@ -40,21 +40,20 @@ var loader = (function () {
                 var label = tokens[1];
                 var vector = tokens.slice(2, 2 + 3);
 
-                if (buffersByLabels[label] != undefined) {
+                if (label == 'vt') {
+                    buffersByLabels[label].push(vector[0], vector[1]);
+                }
+                else if (buffersByLabels[label] != undefined) {
                     buffersByLabels[label].push(vector[0], vector[1], vector[2]);
                 }
             }
         }
 
-        vertexIndices = vertexIndices.map(function (x) {
-            return x - 1;
-        });
+//        vertexIndices = vertexIndices.map(function (x) {
+//            return x - 1;
+//        });
 
-        vertices = vertices.map(function (x) {
-            return x * 0.25;
-        });
-
-        var model = createModel("Bunny", vertices, vertexIndices, vertexNormals);
+        var model = createModel("Cube", vertices, vertexIndices, vertexNormals, vertexTextureCoords);
 
         return model;
     }

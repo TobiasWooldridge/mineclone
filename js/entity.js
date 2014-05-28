@@ -34,23 +34,27 @@ function createNormals(model) {
     }
 }
 
-
 function createEntity(model, position, velocity, attributes) {
     position = position || [0, 0, 0];
     velocity = velocity || [0, 0, 0];
     attributes = attributes || {};
 
     var vertexBuffer = createWebGLFloatArrayBuffer(model.vertices);
+
     var vertexIndexBuffer = createIndexBuffer(model.vertexIndices);
+
     var normalBuffer = createWebGLFloatArrayBuffer(model.vertexNormals);
-    var colorBuffer = createWebGLFloatArrayBuffer(model.vertexColors);
+
+    var textureCoordBuffer = createWebGLFloatArrayBuffer(model.vertexTextureCoords);
+    textureCoordBuffer.itemSize = 2;
+    textureCoordBuffer.numItems = model.numTriangles * 2;
 
     var entity = {
         model: model,
         vertexBuffer: vertexBuffer,
         vertexIndexBuffer: vertexIndexBuffer,
         normalBuffer: normalBuffer,
-        colorBuffer: colorBuffer,
+        textureCoordBuffer: textureCoordBuffer,
         triangles: model.numTriangles,
         position: position,
         velocity: velocity,
@@ -68,6 +72,12 @@ function createEntity(model, position, velocity, attributes) {
     }
 
     return entity;
+}
+
+function createScaledEntity(scale, model, position, velocity, attributes) {
+    model.vertices = model.vertices.map(function(x) { return x * scale; } );
+
+    return createEntity(model, position, velocity, attributes);
 }
 
 function createLine(from, to) {
@@ -121,97 +131,6 @@ function createPlatform(size, color, position, velocity, attributes) {
     ];
 
     return createEntity(createModel("Plane", vertices, vertexIndices, normals, color), position, velocity, attributes);
-}
-
-function createCube(size, color, position, velocity, attributes) {
-    var vertices = [
-        // Front face
-        -1.0, -1.0, 1.0,
-        1.0, -1.0, 1.0,
-        1.0, 1.0, 1.0,
-        -1.0, 1.0, 1.0,
-
-        // Back face
-        -1.0, -1.0, -1.0,
-        -1.0, 1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, -1.0, -1.0,
-
-        // Top face
-        -1.0, 1.0, -1.0,
-        -1.0, 1.0, 1.0,
-        1.0, 1.0, 1.0,
-        1.0, 1.0, -1.0,
-
-        // Bottom face
-        -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0,
-        1.0, -1.0, 1.0,
-        -1.0, -1.0, 1.0,
-
-        // Right face
-        1.0, -1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, 1.0, 1.0,
-        1.0, -1.0, 1.0,
-
-        // Left face
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0, 1.0,
-        -1.0, 1.0, 1.0,
-        -1.0, 1.0, -1.0
-    ].map(function (x) {
-            return x * size / 2;
-        });
-
-    var normals = [
-        // Front
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-
-        // Back
-        0.0, 0.0, -1.0,
-        0.0, 0.0, -1.0,
-        0.0, 0.0, -1.0,
-        0.0, 0.0, -1.0,
-
-        // Top
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-
-        // Bottom
-        0.0, -1.0, 0.0,
-        0.0, -1.0, 0.0,
-        0.0, -1.0, 0.0,
-        0.0, -1.0, 0.0,
-
-        // Right
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-
-        // Left
-        -1.0, 0.0, 0.0,
-        -1.0, 0.0, 0.0,
-        -1.0, 0.0, 0.0,
-        -1.0, 0.0, 0.0
-    ];
-
-    var vertexIndices = [
-        0, 1, 2, 0, 2, 3,    // front
-        4, 5, 6, 4, 6, 7,    // back
-        8, 9, 10, 8, 10, 11,   // top
-        12, 13, 14, 12, 14, 15,   // bottom
-        16, 17, 18, 16, 18, 19,   // right
-        20, 21, 22, 20, 22, 23    // left
-    ];
-
-    return createEntity(createModel("Cube", vertices, vertexIndices, normals, color), position, velocity, attributes);
 }
 
 

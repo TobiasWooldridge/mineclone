@@ -38,7 +38,8 @@
 
 
     var modelFiles = {
-        './objects/teapot.obj': null
+//        './objects/teapot.obj': null,
+        './objects/cube.obj' : null
     };
 
     var imageFiles = {
@@ -50,7 +51,8 @@
         console.log("All resources loaded!");
 
         var models = {
-            teapot: modelFiles['./objects/teapot.obj']
+//            teapot: modelFiles['./objects/teapot.obj'],
+            cube: modelFiles['./objects/teapot.obj']
         };
 
         var images = {
@@ -64,3 +66,4 @@
         [loadObjects, loadTextures],
         allResourcesLoaded);
 })();
+
