@@ -52,7 +52,7 @@
 
         var models = {
 //            teapot: modelFiles['./objects/teapot.obj'],
-            cube: modelFiles['./objects/teapot.obj']
+            cube: modelFiles['./objects/cube.obj']
         };
 
         var images = {
