@@ -1,4 +1,3 @@
-
 function createNormals(model) {
     if (model.vertexNormals.length > 0) {
         return;
@@ -9,7 +8,9 @@ function createNormals(model) {
     // Calculate every normal value for each vertex
     for (var i = 0; i < model.vertexIndices.length; i += 3) {
         var triangleIndices = model.vertexIndices.slice(i, i + 3);
-        var vertices = triangleIndices.map(function(x) { return getVertex(model.vertices, x); });
+        var vertices = triangleIndices.map(function (x) {
+            return getVertex(model.vertices, x);
+        });
 
         var normal = calculateNormal(vertices[0], vertices[1], vertices[2]);
 
@@ -19,7 +20,7 @@ function createNormals(model) {
         }
     }
 
-    for (var i = 0; i < model.vertices.length/3; i ++) {
+    for (var i = 0; i < model.vertices.length / 3; i++) {
         var normal = [0, 0, 0];
         for (var j = 0; j < normalsByIndex[i].length; j++) {
             normal[0] += normalsByIndex[i][j][0];
@@ -32,8 +33,6 @@ function createNormals(model) {
         _.push3(model.vertexNormals, normal);
     }
 }
-
-
 
 
 function createEntity(model, position, velocity, attributes) {
@@ -104,7 +103,9 @@ function createPlatform(size, color, position, velocity, attributes) {
         -1.0, 0.0, 1.0,
         1.0, 0.0, 1.0,
         1.0, 0.0, -1.0
-    ].map(function (x) { return x * size / 2; });
+    ].map(function (x) {
+            return x * size / 2;
+        });
 
     var normals = [
         // Top
@@ -243,7 +244,9 @@ function createSphere(diameter, color, position, velocity, attributes) {
         }
     }
 
-    vertices.map(function(x) { return x * radius; });
+    vertices.map(function (x) {
+        return x * radius;
+    });
 
     var vertexIndices = [];
     for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {

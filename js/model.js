@@ -25,7 +25,7 @@ function createModel(name, vertices, vertexIndices, vertexNormals, colors) {
     var numTriangles = vertexIndices.length / 3;
     var numVertices = vertices.length / 3;
 
-    // Use all-white colors if they're undefined
+    // Use all-white colors if no colours are defined
     if (colors == undefined) {
         colors = [];
 
