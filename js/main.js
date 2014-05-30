@@ -43,7 +43,8 @@
     };
 
     var imageFiles = {
-        './textures/stone.jpg': null
+        './textures/stone.jpg': null,
+        './textures/stone_red.jpg': null
     };
 
 
@@ -52,11 +53,13 @@
 
         var models = {
 //            teapot: modelFiles['./objects/teapot.obj'],
-            cube: modelFiles['./objects/cube.obj']
+            cube: modelFiles['./objects/cube.obj'],
+            sphere: createSphere()
         };
 
         var images = {
-            'stone': imageFiles['./textures/stone.jpg']
+            'stone': imageFiles['./textures/stone.jpg'],
+            'stone_red': imageFiles['./textures/stone_red.jpg']
         };
 
         renderer.start(models, images);

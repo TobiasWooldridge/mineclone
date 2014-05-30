@@ -34,7 +34,7 @@ function createNormals(model) {
     }
 }
 
-function createEntity(model, position, velocity, attributes) {
+function createEntity(model, texture, position, velocity, attributes) {
     position = position || [0, 0, 0];
     velocity = velocity || [0, 0, 0];
     attributes = attributes || {};
@@ -68,16 +68,17 @@ function createEntity(model, position, velocity, attributes) {
             velocity[1] += gravity[1] * (timestep / 1000);
             velocity[2] += gravity[2] * (timestep / 1000);
         },
+        texture: texture,
         attributes: attributes
     }
 
     return entity;
 }
 
-function createScaledEntity(scale, model, position, velocity, attributes) {
+function createScaledEntity(scale, model, texture, position, velocity, attributes) {
     model.vertices = model.vertices.map(function(x) { return x * scale; } );
 
-    return createEntity(model, position, velocity, attributes);
+    return createEntity(model, texture, position, velocity, attributes);
 }
 
 function createLine(from, to) {

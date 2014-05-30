@@ -93,7 +93,7 @@ var renderer = (function () {
 
             // Set the texture
             gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, textures["stone"]);
+            gl.bindTexture(gl.TEXTURE_2D, entity.texture);
             gl.uniform1i(shaderProgram.samplerUniform, 0);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
@@ -299,8 +299,8 @@ var renderer = (function () {
 
         entities = [
 //            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
-            createScaledEntity(2, models.cube, [0, 5, 0]),
-            createScaledEntity(2, createSphere(2.5), [-5, 5, 0])
+            createScaledEntity(2, models.cube, textures.stone, [0, 5, 0]),
+            createScaledEntity(2, models.sphere, textures.stone_red, [-5, 5, 0])
 //            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
         ];
 
