@@ -36,7 +36,7 @@ function createModel(name, vertices, vertexIndices, vertexNormals, vertexTexture
     };
 
 
-    createNormals(model);
+    //createNormals(model);
 
     verifyModel(model);
 

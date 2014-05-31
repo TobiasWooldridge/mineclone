@@ -299,8 +299,8 @@ var renderer = (function () {
 
         entities = [
 //            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
-            createScaledEntity(2, models.cube, textures.stone, [0, 5, 0]),
-            createScaledEntity(2, models.sphere, textures.stone_red, [-5, 5, 0])
+            createScaledEntity(2, models.cube, textures.stone_red, [0, 5, 0]),
+            createScaledEntity(2, models.sphere, textures.stone, [-5, 5, 0])
 //            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
         ];
 
