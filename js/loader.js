@@ -41,10 +41,10 @@ var loader = (function () {
                 var vector = tokens.slice(2, 2 + 3);
 
                 if (label == 'vt') {
-                    buffersByLabels[label].push(vector[0], vector[1]);
+                    buffersByLabels[label].push(+vector[0], +vector[1]);
                 }
                 else if (buffersByLabels[label] != undefined) {
-                    buffersByLabels[label].push(vector[0], vector[1], vector[2]);
+                    buffersByLabels[label].push(+vector[0], +vector[1], +vector[2]);
                 }
             }
         }
@@ -53,7 +53,7 @@ var loader = (function () {
 //            return x - 1;
 //        });
 
-        var model = createModel("Cube", vertices, vertexIndices, vertexNormals, vertexTextureCoords);
+        var model = Model.create("Cube", vertices, vertexIndices, vertexNormals, vertexTextureCoords);
 
         return model;
     }

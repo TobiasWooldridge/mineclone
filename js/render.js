@@ -47,7 +47,7 @@ var renderer = (function () {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-        var cameraPosition = [0.0, 2, -30.0];
+        var cameraPosition = [0.0, 2, -15.0];
 
         loadIdentity();
         mvTranslate(cameraPosition);
@@ -59,7 +59,7 @@ var renderer = (function () {
         var fieldOfView = 45;
         var aspectRatio = 16 / 9;
         var minRenderDistance = 0.1;
-        var maxRenderDistance = 100;
+        var maxRenderDistance = 200;
         perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
 
         // Draw all entities
@@ -73,8 +73,8 @@ var renderer = (function () {
                 entity.move(timeDelta);
 
                 for (var i = 0; i < 3; i++) {
-                    if (entity.position[i] < -10 || entity.position[i] > 10) {
-                        entity.position[i] = Math.max(-10, Math.min(entity.position[i], 10));
+                    if (entity.position[i] < -5 || entity.position[i] > 5) {
+                        entity.position[i] = Math.max(-5, Math.min(entity.position[i], 5));
                         entity.velocity[i] *= -1;
                     }
                 }
@@ -284,6 +284,25 @@ var renderer = (function () {
     }
 
 
+    function createMap(cube) {
+        var offsets = [];
+
+        for (var i = -10; i <= 10; i++) {
+            for (var j = -10; j <= 10; j++) {
+                offsets.push([i, 0, j]);
+            }
+        }
+
+        var model = Model.create("Moo", [], [], [], []);
+
+        for (var i = 0; i < offsets.length; i++) {
+            var addition = cube.clone().shift(offsets[i].map(function(x) { return x * 2 }));
+            model = Model.combine(model, addition);
+        }
+
+        return model;
+    }
+
     function start(models, images) {
         canvas = document.getElementById("glcanvas");
 
@@ -299,8 +318,9 @@ var renderer = (function () {
 
         entities = [
 //            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
-            createScaledEntity(2, models.cube, textures.stone_red, [0, 5, 0]),
-            createScaledEntity(2, models.sphere, textures.stone, [-5, 5, 0])
+            createScaledEntity(0.5, createMap(models.cube), textures.stone, [0, -6, 0], [0, 0, 0], { stationary: true }),
+//            createScaledEntity(2, models.cube, textures.stone_red, [0, 5, 0]),
+            createScaledEntity(0.5, models.sphere, textures.solid, [0, 5, 0])
 //            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
         ];
 
