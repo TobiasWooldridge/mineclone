@@ -14,7 +14,7 @@ var loader = (function () {
 
     var getResource = _.curry(request, ['GET']);
 
-    function parseObj(objFile) {
+    function parseObj(name, objFile) {
         var vertices = [], vertexNormals = [], vertexIndices = [], vertexTextureCoords = [];
 
         var buffersByLabels = {
@@ -49,17 +49,13 @@ var loader = (function () {
             }
         }
 
-//        vertexIndices = vertexIndices.map(function (x) {
-//            return x - 1;
-//        });
-
-        var model = Model.create("Cube", vertices, vertexIndices, vertexNormals, vertexTextureCoords);
+        var model = Model.create(name, vertices, vertexIndices, vertexNormals, vertexTextureCoords);
 
         return model;
     }
 
     return {
-        'getResource': getResource,
-        'parseObj': parseObj
+        getResource : getResource,
+        parseObj : parseObj
     };
 })();

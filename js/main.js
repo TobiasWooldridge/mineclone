@@ -9,7 +9,7 @@
         async.map(modelPaths,
             function (path, callback) {
                 loader.getResource(path, function (body) {
-                    modelFiles[path] = loader.parseObj(body);
+                    modelFiles[path] = loader.parseObj(path, body);
                     callback(undefined, body);
                 });
             },
@@ -38,7 +38,6 @@
 
 
     var modelFiles = {
-//        './objects/teapot.obj': null,
         './objects/cube.obj' : null
     };
 

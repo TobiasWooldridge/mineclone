@@ -60,27 +60,22 @@ var Model = (function() {
 
 
     function createSphere() {
-        // Taken from http://learningwebgl.com/lessons/lesson11/index.html
-        var radius = 1;
-        var latitudeBands = 20;
-        var longitudeBands = 20;
+        // Adapted from http://learningwebgl.com/lessons/lesson11/index.html
+        var latitudeBands = 12;
+        var longitudeBands = 12;
 
         var vertices = [];
         var normals = [];
         var vertexTextureCoords = [];
         for (var latNumber = 0; latNumber <= latitudeBands; latNumber++) {
             var theta = latNumber * Math.PI / latitudeBands;
-            var sinTheta = Math.sin(theta);
-            var cosTheta = Math.cos(theta);
 
             for (var longNumber = 0; longNumber <= longitudeBands; longNumber++) {
                 var phi = longNumber * 2 * Math.PI / longitudeBands;
-                var sinPhi = Math.sin(phi);
-                var cosPhi = Math.cos(phi);
 
-                var x = cosPhi * sinTheta;
-                var y = cosTheta;
-                var z = sinPhi * sinTheta;
+                var x = Math.cos(phi) * Math.sin(theta);
+                var y = Math.cos(theta);
+                var z = Math.sin(phi) * Math.sin(theta);
                 var u = 1 - (longNumber / longitudeBands);
                 var v = 1 - (latNumber / latitudeBands);
 
@@ -89,10 +84,6 @@ var Model = (function() {
                 vertexTextureCoords.push(u, v);
             }
         }
-
-        vertices.map(function (x) {
-            return x * radius;
-        });
 
         var vertexIndices = [];
         for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {

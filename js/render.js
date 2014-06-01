@@ -290,6 +290,10 @@ var renderer = (function () {
         for (var i = -10; i <= 10; i++) {
             for (var j = -10; j <= 10; j++) {
                 offsets.push([i, 0, j]);
+
+                if (Math.abs(i) == 10 || Math.abs(j) == 10) {
+                    offsets.push([i, 1, j]);
+                }
             }
         }
 
