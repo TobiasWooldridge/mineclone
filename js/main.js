@@ -1,15 +1,15 @@
 (function () {
     function loadObjects(callback) {
         // Load every resource we need
-        var modelPaths = [];
-        for (var fileName in modelFiles) {
-            modelPaths.push(fileName);
+        var modelNames = [];
+        for (var modelName in models) {
+            modelNames.push(modelName);
         }
 
-        async.map(modelPaths,
-            function (path, callback) {
-                loader.getResource(path, function (body) {
-                    modelFiles[path] = loader.parseObj(path, body);
+        async.map(modelNames,
+            function (modelName, callback) {
+                loader.getResource(models[modelName], function (body) {
+                    models[modelName] = loader.parseObj(modelName, body);
                     callback(undefined, body);
                 });
             },
@@ -19,49 +19,41 @@
 
     function loadTextures(callback) {
         // Load every resource we need
-        var imagePaths = [];
-        for (var fileName in imageFiles) {
-            imagePaths.push(fileName);
+        var imageNames = [];
+        for (var imageName in images) {
+            imageNames.push(imageName);
         }
 
-        async.map(imagePaths,
-            function (path, callback) {
+        async.map(imageNames,
+            function (imageName, callback) {
                 var image = new Image();
                 image.onload = function imageLoadedCallback() {
-                    imageFiles[path] = image;
+                    images[imageName] = image;
                     callback(undefined, image);
                 }
-                image.src = path;
+                image.src = images[imageName];
             },
             callback);
     }
 
 
-    var modelFiles = {
-        './objects/cube.obj' : null
+    var models = {
+        cube : './objects/cube.obj'
     };
 
-    var imageFiles = {
-        './textures/stone.jpg': null,
-        './textures/stone_red.jpg': null,
-        './textures/solid.png': null
+    var images = {
+        stone : './textures/stone.jpg',
+        stone_red : './textures/stone_red.jpg',
+        solid : './textures/solid.png',
+        box : './textures/box.png'
     };
 
 
     function allResourcesLoaded() {
         console.log("All resources loaded!");
 
-        var models = {
-//            teapot: modelFiles['./objects/teapot.obj'],
-            cube: modelFiles['./objects/cube.obj'],
-            sphere: Model.createSphere()
-        };
-
-        var images = {
-            'stone': imageFiles['./textures/stone.jpg'],
-            'stone_red': imageFiles['./textures/stone_red.jpg'],
-            'solid': imageFiles['./textures/solid.png']
-        };
+        // I generate a sphere because it seems more sensible to generate it than save it in a .obj
+        models.sphere = Model.createSphere();
 
         renderer.start(models, images);
     }

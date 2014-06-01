@@ -61,8 +61,8 @@ var Model = (function() {
 
     function createSphere() {
         // Adapted from http://learningwebgl.com/lessons/lesson11/index.html
-        var latitudeBands = 12;
-        var longitudeBands = 12;
+        var latitudeBands = 20;
+        var longitudeBands = 20;
 
         var vertices = [];
         var normals = [];

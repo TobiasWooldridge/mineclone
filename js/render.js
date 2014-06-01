@@ -322,7 +322,7 @@ var renderer = (function () {
 
         entities = [
 //            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
-            createScaledEntity(0.5, createMap(models.cube), textures.stone, [0, -6, 0], [0, 0, 0], { stationary: true }),
+            createScaledEntity(0.5, createMap(models.cube), textures.box, [0, -6, 0], [0, 0, 0], { stationary: true }),
 //            createScaledEntity(2, models.cube, textures.stone_red, [0, 5, 0]),
             createScaledEntity(0.5, models.sphere, textures.solid, [0, 5, 0])
 //            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
