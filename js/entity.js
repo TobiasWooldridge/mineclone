@@ -1,39 +1,3 @@
-//function createNormals(model) {
-//    if (model.vertexNormals.length > 0) {
-//        return;
-//    }
-//
-//    var normalsByIndex = [];
-//
-//    // Calculate every normal value for each vertex
-//    for (var i = 0; i < model.vertexIndices.length; i += 3) {
-//        var triangleIndices = model.vertexIndices.slice(i, i + 3);
-//        var vertices = triangleIndices.map(function (x) {
-//            return getVertex(model.vertices, x);
-//        });
-//
-//        var normal = calculateNormal(vertices[0], vertices[1], vertices[2]);
-//
-//        for (var v = 0; v < 3; v++) {
-//            normalsByIndex[triangleIndices[v]] = normalsByIndex[triangleIndices[v]] || [];
-//            normalsByIndex[triangleIndices[v]].push(normal);
-//        }
-//    }
-//
-//    for (var i = 0; i < model.vertices.length / 3; i++) {
-//        var normal = [0, 0, 0];
-//        for (var j = 0; j < normalsByIndex[i].length; j++) {
-//            normal[0] += normalsByIndex[i][j][0];
-//            normal[1] += normalsByIndex[i][j][1];
-//            normal[2] += normalsByIndex[i][j][2];
-//        }
-//
-//        normal = normalize(normal);
-//
-//        _.push3(model.vertexNormals, normal);
-//    }
-//}
-
 function createEntity(model, texture, position, velocity, attributes) {
     position = position || [0, 0, 0];
     velocity = velocity || [0, 0, 0];
@@ -79,13 +43,6 @@ function createScaledEntity(scale, model, texture, position, velocity, attribute
     model.vertices = model.vertices.map(function(x) { return x * scale; } );
 
     return createEntity(model, texture, position, velocity, attributes);
-}
-
-function createLine(from, to) {
-    return {
-        vertexBuffer: createWebGLFloatArrayBuffer(from.concat(to)),
-        indexBuffer: createIndexBuffer([0, 1])
-    };
 }
 
 function createWebGLFloatArrayBuffer(data) {

@@ -37,95 +37,83 @@ var renderer = (function () {
 
     var angle = 20;
 
-    function drawEntities() {
+    function tick () {
+        computePhysics();
+        computeGraphics();
+    }
 
+    function computePhysics() {
         var currentTime = (new Date).getTime();
         var timeDelta = Math.min(currentTime - lastUpdateTime, 1000 / 20);
         lastUpdateTime = currentTime;
 
+        for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
+            var entity = entities[entityIndex];
 
+            if (entity.attributes.stationary) {
+                continue;
+            }
+
+            entity.accelerate(gravity, timeDelta);
+            entity.move(timeDelta);
+
+            for (var i = 0; i < 3; i++) {
+                if (entity.position[i] < -5 || entity.position[i] > 5) {
+                    entity.position[i] = Math.max(-5, Math.min(entity.position[i], 5));
+                    entity.velocity[i] *= -1;
+                }
+            }
+        }
+    }
+
+    function computeGraphics() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
 
         var cameraPosition = [0.0, 2, -15.0];
 
         loadIdentity();
         mvTranslate(cameraPosition);
-        mvPushMatrix();
-        mvRotate(20, [1, 0, 0]);
-        mvRotate(angle++, [0, 1, 0]);
 
 
-        var fieldOfView = 45;
-        var aspectRatio = 16 / 9;
-        var minRenderDistance = 0.1;
-        var maxRenderDistance = 200;
-        perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
+        mvScope(function() {
+            mvRotate(20, [1, 0, 0]);
+            mvRotate(angle++, [0, 1, 0]);
 
-        // Draw all entities
-        for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
-            mvPushMatrix();
+            var fieldOfView = 45;
+            var aspectRatio = 16 / 9;
+            var minRenderDistance = 0.1;
+            var maxRenderDistance = 200;
+            perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
 
-            var entity = entities[entityIndex];
+            // Draw all entities
+            for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
+                var entity = entities[entityIndex];
 
-            if (!entity.attributes.stationary) {
-                entity.accelerate(gravity, timeDelta);
-                entity.move(timeDelta);
+                mvScope(function () {
+                    mvTranslate(entity.position);
 
-                for (var i = 0; i < 3; i++) {
-                    if (entity.position[i] < -5 || entity.position[i] > 5) {
-                        entity.position[i] = Math.max(-5, Math.min(entity.position[i], 5));
-                        entity.velocity[i] *= -1;
-                    }
-                }
+                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
+                    gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
+                    gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
+                    gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+
+                    // Set the texture
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, entity.texture);
+                    gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
+
+                    setMatrixUniforms();
+                    gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
+                });
             }
 
-            mvTranslate(entity.position);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
-            gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
-            gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
-            gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
-
-            // Set the texture
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, entity.texture);
-            gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
-
-            setMatrixUniforms();
-            gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
-
-            mvPopMatrix();
-        }
-
-
-        // Draw all lines
-        mvPushMatrix();
-
-        for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-            var line = lines[lineIndex];
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, line.vertexBuffer);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, line.indexBuffer);
-
-            gl.vertexAttribPointer(shaderProgram.aposAttrib, 3, gl.FLOAT, false, 0, 0);
-            gl.lineWidth(1.0);
-            gl.uniform4f(shaderProgram.colorUniform, 1, 0, 0, 1);
-
-            setMatrixUniforms();
-            gl.drawElements(gl.LINES, 2, gl.UNSIGNED_SHORT, 0);
-        }
-
-        mvPopMatrix();
-
-
-        mvPopMatrix();
+        });
     }
 
     function initShaders() {
@@ -283,6 +271,14 @@ var renderer = (function () {
         multMatrix(m);
     }
 
+    function mvScope(fn) {
+        mvPushMatrix();
+
+        fn();
+
+        mvPopMatrix();
+    }
+
 
     function createMap(cube) {
         var offsets = [];
@@ -330,7 +326,7 @@ var renderer = (function () {
 
         lines = [];
 
-        setInterval(drawEntities, 1000 / 75);
+        setInterval(tick, 1000 / 75);
     }
 
     return {
