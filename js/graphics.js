@@ -1,7 +1,6 @@
 var gl;
 
-var renderer = (function () {
-
+var Graphics = function Graphics() {
     var canvas;
 
     var mvMatrix;
@@ -11,14 +10,10 @@ var renderer = (function () {
     var textureCoordAttribute;
     var perspectiveMatrix;
 
-    var lastUpdateTime = 0;
-
     var entities = [];
-    var lines = [];
-    var textures = {};
 
-    var gravity = [0, -20, 0];
-
+    var cameraAngle = [20, 0, 0];
+    var cameraPosition = [0.0, 2, -15.0];
 
     function initWebGL() {
         gl = null;
@@ -36,48 +31,16 @@ var renderer = (function () {
     }
 
     var angle = 20;
-
     function tick () {
-        computePhysics();
-        computeGraphics();
-    }
-
-    function computePhysics() {
-        var currentTime = (new Date).getTime();
-        var timeDelta = Math.min(currentTime - lastUpdateTime, 1000 / 20);
-        lastUpdateTime = currentTime;
-
-        for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
-            var entity = entities[entityIndex];
-
-            if (entity.attributes.stationary) {
-                continue;
-            }
-
-            entity.accelerate(gravity, timeDelta);
-            entity.move(timeDelta);
-
-            for (var i = 0; i < 3; i++) {
-                if (entity.position[i] < -5 || entity.position[i] > 5) {
-                    entity.position[i] = Math.max(-5, Math.min(entity.position[i], 5));
-                    entity.velocity[i] *= -1;
-                }
-            }
-        }
-    }
-
-    function computeGraphics() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        var cameraPosition = [0.0, 2, -15.0];
-
         loadIdentity();
-        mvTranslate(cameraPosition);
-
 
         mvScope(function() {
-            mvRotate(20, [1, 0, 0]);
-            mvRotate(angle++, [0, 1, 0]);
+            mvTranslate(cameraPosition);
+            mvRotate(cameraAngle[0], [1, 0, 0]);
+            mvRotate(cameraAngle[1], [0, 1, 0]);
+            mvRotate(cameraAngle[2], [0, 0, 1]);
 
             var fieldOfView = 45;
             var aspectRatio = 16 / 9;
@@ -116,19 +79,21 @@ var renderer = (function () {
         });
     }
 
+    function getCameraAngle() {
+        return cameraAngle;
+    }
+
     function initShaders() {
         var fragmentShader = getShader(gl, "blinnPhong-fs");
         var vertexShader = getShader(gl, "blinnPhong-vs");
 
         // Create the shader program
-
         shaderProgram = gl.createProgram();
         gl.attachShader(shaderProgram, vertexShader);
         gl.attachShader(shaderProgram, fragmentShader);
         gl.linkProgram(shaderProgram);
 
         // If creating the shader program failed, alert
-
         if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
             alert("Unable to initialize the shader program.");
         }
@@ -196,6 +161,8 @@ var renderer = (function () {
     }
 
     function initTextures(images) {
+        var textures = {};
+
         for (var imageName in images) {
             if (!images.hasOwnProperty(imageName)) {
                 continue;
@@ -213,11 +180,9 @@ var renderer = (function () {
 
             textures[imageName] = texture;
         }
-    }
 
-    //
-    // Matrix utility functions
-    //
+        return textures;
+    }
 
     function loadIdentity() {
         mvMatrix = Matrix.I(4);
@@ -273,37 +238,11 @@ var renderer = (function () {
 
     function mvScope(fn) {
         mvPushMatrix();
-
         fn();
-
         mvPopMatrix();
     }
 
-
-    function createMap(cube) {
-        var offsets = [];
-
-        for (var i = -10; i <= 10; i++) {
-            for (var j = -10; j <= 10; j++) {
-                offsets.push([i, 0, j]);
-
-                if (Math.abs(i) == 10 || Math.abs(j) == 10) {
-                    offsets.push([i, 1, j]);
-                }
-            }
-        }
-
-        var model = Model.create("Moo", [], [], [], []);
-
-        for (var i = 0; i < offsets.length; i++) {
-            var addition = cube.clone().shift(offsets[i].map(function(x) { return x * 2 }));
-            model = Model.combine(model, addition);
-        }
-
-        return model;
-    }
-
-    function start(models, images) {
+    function start() {
         canvas = document.getElementById("glcanvas");
 
         initWebGL(canvas);
@@ -314,23 +253,18 @@ var renderer = (function () {
         gl.depthFunc(gl.LEQUAL);
 
         initShaders();
-        initTextures(images);
-
-        entities = [
-//            createCube(2, palette.red, [-5, 5, 5], [0, 0, 0]),
-            createScaledEntity(0.5, createMap(models.cube), textures.box, [0, -6, 0], [0, 0, 0], { stationary: true }),
-//            createScaledEntity(2, models.cube, textures.stone_red, [0, 5, 0]),
-            createScaledEntity(0.5, models.sphere, textures.solid, [0, 5, 0])
-//            createPlatform(100, palette.green, [0, -11, 0], [0, 0, 0], { stationary: true })
-        ];
-
-        lines = [];
-
-        setInterval(tick, 1000 / 75);
     }
+
+    function addEntities(newEntities) {
+        _.pushAll(entities, newEntities);
+    }
+
 
     return {
-        start: start
+        start: start,
+        tick : tick,
+        initTextures : initTextures,
+        getCameraAngle : getCameraAngle,
+        addEntities : addEntities
     }
-
-})();
+};

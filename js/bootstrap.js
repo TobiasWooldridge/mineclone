@@ -15,7 +15,7 @@
             },
             callback
         );
-    };
+    }
 
     function loadTextures(callback) {
         // Load every resource we need
@@ -30,12 +30,11 @@
                 image.onload = function imageLoadedCallback() {
                     images[imageName] = image;
                     callback(undefined, image);
-                }
+                };
                 image.src = images[imageName];
             },
             callback);
     }
-
 
     var models = {
         cube : './objects/cube.obj'
@@ -55,7 +54,7 @@
         // I generate a sphere because it seems more sensible to generate it than save it in a .obj
         models.sphere = Model.createSphere();
 
-        renderer.start(models, images);
+        Game().start(models, images);
     }
 
     async.parallel(
