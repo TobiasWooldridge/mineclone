@@ -42,11 +42,22 @@ var Model = (function() {
                     vertexTextureCoords.slice());
             },
             shift : function(offset) {
-                for (var i = 0; i < vertices.length; i++) {
-                    vertices[i] += offset[i % 3];
+                var clone = model.clone();
+
+                for (var i = 0; i < clone.vertices.length; i++) {
+                    clone.vertices[i] += offset[i % 3];
                 }
 
-                return this;
+                return clone;
+            },
+            scale : function(scale) {
+                var clone = model.clone();
+
+                for (var i = 0; i < clone.vertices.length; i++) {
+                    clone.vertices[i] *= scale[i % scale.length];
+                }
+
+                return clone;
             }
         };
 

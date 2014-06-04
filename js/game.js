@@ -13,27 +13,30 @@ var Game = function () {
         physics.tick(gravity);
     }
 
-    function createMap(cube) {
+    function createMap() {
         var offsets = [];
 
         for (var i = -10; i <= 10; i++) {
             for (var j = -10; j <= 10; j++) {
-                offsets.push([i, 0, j]);
+                offsets.push([i * 2, 0, j * 2]);
 
                 if (Math.abs(i) == 10 || Math.abs(j) == 10) {
-                    offsets.push([i, 1, j]);
+                    offsets.push([i * 2, 2, j * 2]);
                 }
             }
         }
 
-        var model = Model.create("Moo", [], [], [], []);
+        return offsets;
+    }
 
-        for (var i = 0; i < offsets.length; i++) {
-            var addition = cube.clone().shift(offsets[i].map(function(x) { return x * 2 }));
-            model = Model.combine(model, addition);
-        }
+    function addEntity(model, texture, position, graphicsProperties, physicsProperties) {
+        var baseEntity = createEntity(model, position);
 
-        return model;
+        var physicsEntity = createPhysicsEntity(baseEntity);
+        physics.addEntity(physicsEntity);
+
+        var graphicsEntity = createGraphicsEntity(baseEntity, texture);
+        graphics.addEntity(graphicsEntity);
     }
 
     function start(models, images) {
@@ -43,16 +46,14 @@ var Game = function () {
         graphics.start();
         var textures = graphics.initTextures(images);
 
-        var entities = [
-            createScaledEntity(0.5, createMap(models.cube), textures.box, [0, -6, 0], [0, 0, 0], { stationary: true }),
-            createScaledEntity(0.5, models.sphere, textures.solid, [0, 5, 0])
-        ];
+        addEntity(models.sphere, textures.solid, [0, 5, 0], {}, { type: "sphere" });
 
-        physics.addEntities(entities);
-        graphics.addEntities(entities);
+        var map = createMap(models.block);
+        for (var i = 0; i < map.length; i++) {
+           addEntity(models.block, textures.grassblock, map[i], {}, { stationary: true, type: "box" });
+        }
 
         setInterval(tick, 1000 / 60);
-
     }
 
     return {

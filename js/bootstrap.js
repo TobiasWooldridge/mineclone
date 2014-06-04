@@ -37,14 +37,16 @@
     }
 
     var models = {
-        cube : './objects/cube.obj'
+        cube : './objects/cube.obj',
+        block : './objects/block.obj'
     };
 
     var images = {
         stone : './textures/stone.jpg',
         stone_red : './textures/stone_red.jpg',
         solid : './textures/solid.png',
-        box : './textures/box.png'
+        box : './textures/box.png',
+        grassblock : './textures/grassblock.png'
     };
 
 

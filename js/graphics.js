@@ -13,7 +13,7 @@ var Graphics = function Graphics() {
     var entities = [];
 
     var cameraAngle = [20, 0, 0];
-    var cameraPosition = [0.0, 2, -15.0];
+    var cameraPosition = [0.0, 2, -30.0];
 
     function initWebGL() {
         gl = null;
@@ -255,6 +255,11 @@ var Graphics = function Graphics() {
         initShaders();
     }
 
+
+    function addEntity(entity) {
+        entities.push(entity);
+    }
+
     function addEntities(newEntities) {
         _.pushAll(entities, newEntities);
     }
@@ -265,6 +270,7 @@ var Graphics = function Graphics() {
         tick : tick,
         initTextures : initTextures,
         getCameraAngle : getCameraAngle,
+        addEntity : addEntity,
         addEntities : addEntities
     }
 };
