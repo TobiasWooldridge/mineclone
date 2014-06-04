@@ -82,7 +82,7 @@ function Physics() {
 
         sphere.position[0] = sphere.position[0] + (contactNormal[0] * dist);
         sphere.position[1] = sphere.position[1] + (contactNormal[1] * dist);
-        sphere.position[2] = sphere.position[1] + (contactNormal[1] * dist);
+        sphere.position[2] = sphere.position[2] + (contactNormal[2] * dist);
     }
 
     function addEntity(entity) {
