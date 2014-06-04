@@ -264,7 +264,6 @@ var Graphics = function Graphics() {
         _.pushAll(entities, newEntities);
     }
 
-
     return {
         start: start,
         tick : tick,

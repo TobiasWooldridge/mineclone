@@ -39,7 +39,6 @@ function Physics() {
     }
 
     function processCollision(a, b) {
-        return;
         if (a.type == "sphere" && b.type == "box") {
             return processSphereBoxCollision(a, b);
         }
@@ -49,18 +48,17 @@ function Physics() {
     }
 
     function processSphereBoxCollision(sphere, box) {
-        var center = sphere.position;
-
-        // TODO: Make relCenter correctly reflect the position of the sphere relative to rotation of the box
-        var relCenter = center;
+        // Detect a collision
+        var relCenter = subtractVector(sphere.position, box.position);
 
         for (var i = 0; i < 3; i++) {
-            if (real_abs(relCenter[i]) - sphere.radius > box.halfSize[i]) {
+            if (Math.abs(relCenter[i]) - sphere.radius > box.halfSize[i]) {
                 // No collision
                 return;
             }
         }
 
+        // Determine which point in the box is closest to the sphere
         var closestPoint = [0, 0, 0];
         for (var i = 0; i < 3; i++) {
             var dist = relCenter[i];
@@ -70,12 +68,17 @@ function Physics() {
         }
 
         var dist = squareMagnitude(subtractVector(closestPoint, relCenter));
-        if (dist > (sphere.radius * sphere.radius)) {
+        if (dist >= (sphere.radius * sphere.radius)) {
             // No collision
             return;
         }
 
-        console.log("OH MY GOD A COLLISION");
+        // Now generate a contact
+        var contactNormal = normalize(subtractVector(sphere.position, closestPoint));
+
+        sphere.velocity[0] = sphere.velocity[0] * -contactNormal[0];
+        sphere.velocity[1] = sphere.velocity[1] * -contactNormal[1];
+        sphere.velocity[2] = sphere.velocity[2] * -contactNormal[2];
     }
 
     function addEntity(entity) {

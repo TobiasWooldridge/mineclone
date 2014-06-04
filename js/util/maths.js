@@ -25,3 +25,15 @@ function subtractVector(a, b) {
     return result;
 }
 
+function addVector(a, b) {
+    if (a.length != b.length) {
+        throw "Cannot subtract vectors of different length";
+    }
+
+    var result = [];
+    for (var i = 0; i < a.length; i++) {
+        result.push(a[i] + b[i]);
+    }
+    return result;
+}
+

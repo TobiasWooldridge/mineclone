@@ -32,11 +32,11 @@ var Game = function () {
     function addEntity(model, texture, position, graphicsProperties, physicsProperties) {
         var baseEntity = createEntity(model, position);
 
-        var physicsEntity = createPhysicsEntity(baseEntity);
+        var physicsEntity = createPhysicsEntity(baseEntity, physicsProperties);
         physics.addEntity(physicsEntity);
 
         var graphicsEntity = createGraphicsEntity(baseEntity, texture);
-        graphics.addEntity(graphicsEntity);
+        graphics.addEntity(graphicsEntity, graphicsProperties);
     }
 
     function start(models, images) {
@@ -46,11 +46,11 @@ var Game = function () {
         graphics.start();
         var textures = graphics.initTextures(images);
 
-        addEntity(models.sphere, textures.solid, [0, 5, 0], {}, { type: "sphere" });
+        addEntity(models.sphere, textures.solid, [0, 5, 0], {}, { type: "sphere", radius : 1 });
 
         var map = createMap(models.block);
         for (var i = 0; i < map.length; i++) {
-           addEntity(models.block, textures.grassblock, map[i], {}, { stationary: true, type: "box" });
+           addEntity(models.block, textures.grassblock, map[i], {}, { stationary: true, type: "box", halfSize : [1, 1, 1] });
         }
 
         setInterval(tick, 1000 / 60);
