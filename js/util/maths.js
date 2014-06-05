@@ -1,7 +1,5 @@
 function magnitude(v) {
-    return Math.sqrt(v.reduce(function (x, y) {
-        return x + Math.pow(y, 2)
-    }));
+    return Math.sqrt(squareMagnitude(v));
 }
 
 function normalize(v) {
@@ -10,7 +8,7 @@ function normalize(v) {
 }
 
 function squareMagnitude(v) {
-    return v.map(function (x) { return x * x; }).reduce(function (x, y) { return x + y; });
+    return v.reduce(function (x, y) { return x + (y*y); }, 0);
 }
 
 function subtractVector(a, b) {
@@ -37,3 +35,22 @@ function addVector(a, b) {
     return result;
 }
 
+function multiplyVector(a,b) {
+    if (a.length != b.length) {
+        throw "Cannot subtract vectors of different length";
+    }
+
+    var result = [];
+    for (var i = 0; i < a.length; i++) {
+        result.push(a[i] * b[i]);
+    }
+    return result;
+}
+
+function scaleVector(a, n) {
+    return a.map(function(x) { return x * n; });
+}
+
+function dot(a, b) {
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}

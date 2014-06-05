@@ -46,7 +46,7 @@ var Game = function () {
         graphics.start();
         var textures = graphics.initTextures(images);
 
-        addEntity(models.sphere, textures.solid, [0, 5, 0], {}, { type: "sphere", radius : 1 });
+        addEntity(models.sphere, textures.solid, [0, 5, 0], {}, { type: "sphere", radius : 1, velocity : [1, 0, 1] });
 
         var map = createMap(models.block);
         for (var i = 0; i < map.length; i++) {

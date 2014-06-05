@@ -13,15 +13,12 @@ function Physics() {
 
         // Update the velocity for each non-stationary entity
         for (var i = 0; i < movingParts.length; i++) {
+            movingParts[i].move(timeDelta);
             movingParts[i].accelerate(gravity, timeDelta);
         }
 
         processCollisions();
 
-        // Update the position for each non-stationary entity
-        for (var i = 0; i < movingParts.length; i++) {
-            movingParts[i].move(timeDelta);
-        }
     }
 
     function processCollisions() {
@@ -73,16 +70,39 @@ function Physics() {
             return;
         }
 
-        // Now generate a contact
-        var contactNormal = normalize(subtractVector(sphere.position, closestPoint));
+        var collisionMultiplier = [ 1, 1, 1 ];
+        var absMax = 0;
+        var absMaxIdx = 0;
 
-        sphere.velocity[0] = sphere.velocity[0] * -contactNormal[0];
-        sphere.velocity[1] = sphere.velocity[1] * -contactNormal[1];
-        sphere.velocity[2] = sphere.velocity[2] * -contactNormal[2];
+        var idx = 0;
+        for (var i = 0; i < 3; i++) {
+            if (Math.abs(relCenter[i]) > absMax) {
+                absMax = Math.abs(relCenter[i]);
+                absMaxIdx = i;
+            }
+        }
 
-        sphere.position[0] = sphere.position[0] + (contactNormal[0] * dist);
-        sphere.position[1] = sphere.position[1] + (contactNormal[1] * dist);
-        sphere.position[2] = sphere.position[2] + (contactNormal[2] * dist);
+        console.log(relCenter, absMax);
+
+        collisionMultiplier[absMaxIdx] *= -0.95;
+        console.log(collisionMultiplier);
+
+        sphere.velocity = multiplyVector(sphere.velocity, collisionMultiplier);
+
+//        // Now generate a contact
+//        var contactNormal = normalize(subtractVector(sphere.position, closestPoint));
+//
+//        var vr = scaleVector(contactNormal, dot(contactNormal, sphere.velocity));
+//        var vt = subtractVector(sphere.velocity, vr);
+//
+//        console.log(contactNormal);
+//        console.log(sphere.velocity, vr, vt);
+//
+//        sphere.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
+//
+//        for (var i = 0; i < 3; i++) {
+//            sphere.position[i] += contactNormal[i] * dist;
+//        }
     }
 
     function addEntity(entity) {
