@@ -3,24 +3,58 @@ var Game = function () {
     var graphics;
 
     function tick () {
-        graphics.tick();
+        graphics.draw();
 
         var gravity = normalize(graphics.getCameraAngle());
 
         // Use a fixed value for now while I work out the correct maths for camera-oriented gravity
-        gravity = [0, -20, 0];
+        gravity = [0, -1, 0];
 
         physics.tick(gravity);
     }
 
-    function createMap() {
+    function createPlane() {
         var offsets = [];
 
         for (var i = -10; i <= 10; i++) {
             for (var j = -10; j <= 10; j++) {
                 offsets.push([i * 2, 0, j * 2]);
+            }
+        }
 
-                if (Math.abs(i) == 10 || Math.abs(j) == 10) {
+        return offsets;
+    }
+
+    function createMap() {
+        var offsets = [];
+
+        var map = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ];
+
+        for (var i = -10; i <= 10; i++) {
+            for (var j = -10; j <= 10; j++) {
+                if (map[i+10][j+10]) {
                     offsets.push([i * 2, 2, j * 2]);
                 }
             }
@@ -46,14 +80,18 @@ var Game = function () {
         graphics.start();
         var textures = graphics.initTextures(images);
 
-        addEntity(models.sphere, textures.solid, [0, 5, 0], {}, { type: "sphere", radius : 1, velocity : [1, 0, 1] });
+        addEntity(models.sphere, textures.solid, [0, 2, 0], {}, { type: "sphere", radius : 1, velocity : [-2, 0, 3] });
 
-        var map = createMap(models.block);
+        var plane = createPlane();
+        for (var i = 0; i < plane.length; i++) {
+            addEntity(models.cube, textures.box, plane[i], {}, { stationary: true, type: "box", halfSize : [1, 1, 1] });
+        }
+        var map = createMap();
         for (var i = 0; i < map.length; i++) {
-           addEntity(models.block, textures.grassblock, map[i], {}, { stationary: true, type: "box", halfSize : [1, 1, 1] });
+            addEntity(models.block, textures.cubeDims, map[i], {}, { stationary: true, type: "box", halfSize : [1, 1, 1] });
         }
 
-        setInterval(tick, 1000 / 60);
+        setInterval(tick, 1000 / 500);
     }
 
     return {

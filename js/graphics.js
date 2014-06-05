@@ -12,7 +12,7 @@ var Graphics = function Graphics() {
 
     var entities = [];
 
-    var cameraAngle = [20, 20, 0];
+    var cameraAngle = [45, 45, 0];
     var cameraPosition = [0.0, 2, -50.0];
 
     function initWebGL() {
@@ -24,14 +24,21 @@ var Graphics = function Graphics() {
         catch (e) {
         }
 
-        // If we don't have a GL context, give up now
         if (!gl) {
             alert("Unable to initialize WebGL. Your browser may not support it.");
         }
     }
 
+    function updatePerspectiveMatrix() {
+        var fieldOfView = 45;
+        var aspectRatio = canvas.width/canvas.height;
+        var minRenderDistance = 0.1;
+        var maxRenderDistance = 200;
+        perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
+    }
+
     var angle = 20;
-    function tick () {
+    function draw () {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadIdentity();
@@ -41,12 +48,6 @@ var Graphics = function Graphics() {
             mvRotate(cameraAngle[0], [1, 0, 0]);
             mvRotate(cameraAngle[1], [0, 1, 0]);
             mvRotate(cameraAngle[2], [0, 0, 1]);
-
-            var fieldOfView = 45;
-            var aspectRatio = 16 / 9;
-            var minRenderDistance = 0.1;
-            var maxRenderDistance = 200;
-            perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
 
             // Draw all entities
             for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
@@ -252,6 +253,15 @@ var Graphics = function Graphics() {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
 
+        // Update canvas size whenever window is resized
+        window.onresize = function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+            updatePerspectiveMatrix();
+        }
+        window.onresize();
+
         initShaders();
     }
 
@@ -266,7 +276,7 @@ var Graphics = function Graphics() {
 
     return {
         start: start,
-        tick : tick,
+        draw : draw,
         initTextures : initTextures,
         getCameraAngle : getCameraAngle,
         addEntity : addEntity,

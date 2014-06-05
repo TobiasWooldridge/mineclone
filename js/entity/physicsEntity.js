@@ -5,14 +5,14 @@ function createPhysicsEntity(baseEntity, properties) {
         model: baseEntity.model,
         velocity: [0, 0, 0],
         move: function move(time) {
-            this.position[0] += this.velocity[0] * (time / 1000);
-            this.position[1] += this.velocity[1] * (time / 1000);
-            this.position[2] += this.velocity[2] * (time / 1000);
+            this.position[0] += this.velocity[0] * (time / 500);
+            this.position[1] += this.velocity[1] * (time / 500);
+            this.position[2] += this.velocity[2] * (time / 500);
         },
         accelerate: function accelerate(acceleration, time) {
-            this.velocity[0] += acceleration[0] * (time / 1000);
-            this.velocity[1] += acceleration[1] * (time / 1000);
-            this.velocity[2] += acceleration[2] * (time / 1000);
+            this.velocity[0] += acceleration[0] * (time / 500);
+            this.velocity[1] += acceleration[1] * (time / 500);
+            this.velocity[2] += acceleration[2] * (time / 500);
         }
     };
 

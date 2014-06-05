@@ -46,7 +46,7 @@
         stone_red : './textures/stone_red.jpg',
         solid : './textures/solid.png',
         box : './textures/box.png',
-        grassblock : './textures/grassblock.png'
+        cubeDims : './textures/cubeDims.png'
     };
 
 

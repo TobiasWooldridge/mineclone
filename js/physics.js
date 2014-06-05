@@ -7,14 +7,14 @@ function Physics() {
 
     function tick (gravity) {
         var currentTime = (new Date).getTime();
-        var timeDelta = Math.min(currentTime - lastUpdateTime, 1000 / 20);
+        var timeDelta = Math.min(currentTime - lastUpdateTime, 50);
         lastUpdateTime = currentTime;
 
 
         // Update the velocity for each non-stationary entity
         for (var i = 0; i < movingParts.length; i++) {
-            movingParts[i].move(timeDelta);
             movingParts[i].accelerate(gravity, timeDelta);
+            movingParts[i].move(timeDelta);
         }
 
         processCollisions();
@@ -84,7 +84,7 @@ function Physics() {
 
         console.log(relCenter, absMax);
 
-        collisionMultiplier[absMaxIdx] *= -0.95;
+        collisionMultiplier[absMaxIdx] *= -1.00;
         console.log(collisionMultiplier);
 
         sphere.velocity = multiplyVector(sphere.velocity, collisionMultiplier);
