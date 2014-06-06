@@ -82,10 +82,8 @@ function Physics() {
             }
         }
 
-        console.log(relCenter, absMax);
 
         collisionMultiplier[absMaxIdx] *= -1.00;
-        console.log(collisionMultiplier);
 
         sphere.velocity = multiplyVector(sphere.velocity, collisionMultiplier);
 

@@ -12,7 +12,7 @@ var Graphics = function Graphics() {
 
     var entities = [];
 
-    var cameraAngle = [45, 45, 0];
+    var cameraAngle = [25, 45, 0];
     var cameraPosition = [0.0, 2, -50.0];
 
     function initWebGL() {
