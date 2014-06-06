@@ -13,19 +13,21 @@ var Game = function () {
         physics.tick(gravity);
     }
 
-    function createPlane() {
+    function createPlane(halfSize) {
+        var size = halfSize * 2;
         var offsets = [];
 
         for (var i = -10; i <= 10; i++) {
             for (var j = -10; j <= 10; j++) {
-                offsets.push([i * 2, 0, j * 2]);
+                offsets.push([i * size, 0, j * size]);
             }
         }
 
         return offsets;
     }
 
-    function createMap() {
+    function createMap(halfSize) {
+        var size = halfSize * 2;
         var offsets = [];
 
         var map = [
@@ -55,7 +57,7 @@ var Game = function () {
         for (var i = -10; i <= 10; i++) {
             for (var j = -10; j <= 10; j++) {
                 if (map[i+10][j+10]) {
-                    offsets.push([i * 2, 2, j * 2]);
+                    offsets.push([i * size, size, j * size]);
                 }
             }
         }
@@ -80,18 +82,24 @@ var Game = function () {
         graphics.start();
         var textures = graphics.initTextures(images);
 
-        addEntity(models.sphere, textures.solid, [0, 2, 0], {}, { type: "sphere", radius : 1, velocity : [-2, 0, 3] });
+        var sphereScale = 1;
 
-        var plane = createPlane();
+        addEntity(models.sphere, textures.solid, [0, 5, 0], {},  { type: "sphere", radius : sphereScale, velocity : [0.5, 0, 0] });
+
+
+        var mapScale = 1;
+
+        var plane = createPlane(mapScale);
         for (var i = 0; i < plane.length; i++) {
-            addEntity(models.cube, textures.box, plane[i], {}, { stationary: true, type: "box", halfSize : [1, 1, 1] });
-        }
-        var map = createMap();
-        for (var i = 0; i < map.length; i++) {
-            addEntity(models.block, textures.cubeDims, map[i], {}, { stationary: true, type: "box", halfSize : [1, 1, 1] });
+            addEntity(models.cube.scale([mapScale * 0.9]), textures.box, plane[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
         }
 
-        setInterval(tick, 1000 / 500);
+        var map = createMap(mapScale);
+        for (var i = 0; i < map.length; i++) {
+            addEntity(models.block.scale([mapScale * 0.9]), textures.cubeDims, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
+        }
+
+        setInterval(tick, 1000 / 75);
     }
 
     return {

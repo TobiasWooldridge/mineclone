@@ -43,9 +43,11 @@
 
     var images = {
         stone : './textures/stone.jpg',
-        stone_red : './textures/stone_red.jpg',
+        stoneRed : './textures/stone_red.jpg',
         solid : './textures/solid.png',
+        solidRed : './textures/solid_red.png',
         box : './textures/box.png',
+        boxRed : './textures/box_red.png',
         cubeDims : './textures/cubeDims.png'
     };
 

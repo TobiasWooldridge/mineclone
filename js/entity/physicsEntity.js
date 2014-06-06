@@ -3,6 +3,7 @@ function createPhysicsEntity(baseEntity, properties) {
     var physicsEntity = {
         position: baseEntity.position,
         model: baseEntity.model,
+        sharedProperties: baseEntity.properties,
         velocity: [0, 0, 0],
         move: function move(time) {
             this.position[0] += this.velocity[0] * (time / 500);

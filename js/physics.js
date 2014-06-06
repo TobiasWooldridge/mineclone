@@ -15,6 +15,12 @@ function Physics() {
         for (var i = 0; i < movingParts.length; i++) {
             movingParts[i].accelerate(gravity, timeDelta);
             movingParts[i].move(timeDelta);
+
+
+            if (movingParts[i].position[1] < -5) {
+                movingParts[i].position[1] = 5;
+                movingParts[i].velocity[1] = 0;
+            }
         }
 
         processCollisions();
@@ -25,32 +31,49 @@ function Physics() {
         for (var i = 0; i < movingParts.length; i++) {
             var movingPart = movingParts[i];
 
+            var normals = [];
+
             for (var j = 0; j < entities.length; j++) {
                 var entity = entities[j];
 
+                // Things can't collide with themselves
                 if (movingPart == entity) continue;
 
-                processCollision(movingPart, entity);
+                var normal = detectCollision(movingPart, entity);
+
+                if (normal) {
+                    normals.push(normal);
+                }
+            }
+
+            if (normals.length) {
+                var contactNormal = normalize(normals.reduce(addVector, [0, 0, 0]));
+
+                var vr = scaleVector(contactNormal, dot(contactNormal, movingPart.velocity));
+                var vt = subtractVector(movingPart.velocity, vr);
+
+                movingPart.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
             }
         }
     }
 
-    function processCollision(a, b) {
+    function detectCollision(a, b) {
         if (a.type == "sphere" && b.type == "box") {
-            return processSphereBoxCollision(a, b);
+            return detectSphereBoxCollision(a, b);
         }
         else {
             console.error("Could not process collision between " + a.type + " and " + b.type);
         }
     }
 
-    function processSphereBoxCollision(sphere, box) {
+    function detectSphereBoxCollision(sphere, box) {
         // Detect a collision
         var relCenter = subtractVector(sphere.position, box.position);
 
         for (var i = 0; i < 3; i++) {
             if (Math.abs(relCenter[i]) - sphere.radius > box.halfSize[i]) {
                 // No collision
+                box.sharedProperties.colliding -= 1;
                 return;
             }
         }
@@ -67,40 +90,17 @@ function Physics() {
         var dist = squareMagnitude(subtractVector(closestPoint, relCenter));
         if (dist >= (sphere.radius * sphere.radius)) {
             // No collision
+            box.sharedProperties.colliding -= 1;
             return;
         }
 
-        var collisionMultiplier = [ 1, 1, 1 ];
-        var absMax = 0;
-        var absMaxIdx = 0;
+        // Calculate the collision normal
+        var contactNormal = normalize(subtractVector(sphere.position, box.position)); // closestPoint));
+//        var contactNormal = [0, -1, 0];
 
-        var idx = 0;
-        for (var i = 0; i < 3; i++) {
-            if (Math.abs(relCenter[i]) > absMax) {
-                absMax = Math.abs(relCenter[i]);
-                absMaxIdx = i;
-            }
-        }
+        box.sharedProperties.colliding = 20;
 
-
-        collisionMultiplier[absMaxIdx] *= -1.00;
-
-        sphere.velocity = multiplyVector(sphere.velocity, collisionMultiplier);
-
-//        // Now generate a contact
-//        var contactNormal = normalize(subtractVector(sphere.position, closestPoint));
-//
-//        var vr = scaleVector(contactNormal, dot(contactNormal, sphere.velocity));
-//        var vt = subtractVector(sphere.velocity, vr);
-//
-//        console.log(contactNormal);
-//        console.log(sphere.velocity, vr, vt);
-//
-//        sphere.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
-//
-//        for (var i = 0; i < 3; i++) {
-//            sphere.position[i] += contactNormal[i] * dist;
-//        }
+        return contactNormal;
     }
 
     function addEntity(entity) {

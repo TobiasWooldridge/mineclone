@@ -1,7 +1,8 @@
-function createEntity(model, position) {
+function createEntity(model, position, properties) {
     var entity = {
         model: model,
-        position: position
+        position: position,
+        properties: properties || {}
     }
 
     return entity;

@@ -11,9 +11,10 @@ var Graphics = function Graphics() {
     var perspectiveMatrix;
 
     var entities = [];
+    var textures = {};
 
-    var cameraAngle = [25, 45, 0];
-    var cameraPosition = [0.0, 2, -50.0];
+    var cameraAngle = [30, 45, 0];
+    var cameraPosition = [0.0, -2, -30.0];
 
     function initWebGL() {
         gl = null;
@@ -39,6 +40,7 @@ var Graphics = function Graphics() {
 
     var angle = 20;
     function draw () {
+        cameraAngle[1]++;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadIdentity();
@@ -67,7 +69,7 @@ var Graphics = function Graphics() {
 
                     // Set the texture
                     gl.activeTexture(gl.TEXTURE0);
-                    gl.bindTexture(gl.TEXTURE_2D, entity.texture);
+                    gl.bindTexture(gl.TEXTURE_2D, entity.sharedProperties.colliding > 0 ? textures.boxRed: entity.texture);
                     gl.uniform1i(shaderProgram.samplerUniform, 0);
 
                     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
@@ -162,8 +164,6 @@ var Graphics = function Graphics() {
     }
 
     function initTextures(images) {
-        var textures = {};
-
         for (var imageName in images) {
             if (!images.hasOwnProperty(imageName)) {
                 continue;

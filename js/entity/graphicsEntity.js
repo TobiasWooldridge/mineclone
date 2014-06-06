@@ -30,6 +30,8 @@ function createGraphicsEntity(baseEntity, texture, properties) {
 
     var graphicsEntity = {
         position: baseEntity.position,
+        model: baseEntity.model,
+        sharedProperties: baseEntity.properties,
         vertexBuffer: vertexBuffer,
         vertexIndexBuffer: vertexIndexBuffer,
         normalBuffer: normalBuffer,
