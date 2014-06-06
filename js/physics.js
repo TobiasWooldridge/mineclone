@@ -95,8 +95,22 @@ function Physics() {
         }
 
         // Calculate the collision normal
-        var contactNormal = normalize(subtractVector(sphere.position, box.position)); // closestPoint));
-//        var contactNormal = [0, -1, 0];
+        var oldNormal = normalize(subtractVector(sphere.position, box.position));
+
+        var maxIdx = 0;
+        for (var i = 0; i < oldNormal.length; i++) {
+            if (Math.max(oldNormal[i]) > Math.max(oldNormal[maxIdx])) {
+                maxIdx = i;
+            }
+        }
+
+
+        contactNormal = [0, 0, 0];
+        contactNormal[maxIdx] = oldNormal[maxIdx]/(Math.abs(oldNormal[maxIdx]));
+
+
+        // Move the sphere off of the box
+        sphere.position[maxIdx] = box.position[maxIdx] + contactNormal[maxIdx] * (sphere.radius + box.halfSize[maxIdx]);
 
         box.sharedProperties.colliding = 20;
 
