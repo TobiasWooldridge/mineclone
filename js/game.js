@@ -96,7 +96,7 @@ var Game = function () {
 
         var map = createMap(mapScale);
         for (var i = 0; i < map.length; i++) {
-            addEntity(models.block.scale([mapScale * 0.9]), textures.cubeDims, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
+            addEntity(models.cube.scale([mapScale * 0.6]), textures.box, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
         }
 
         setInterval(tick, 1000 / 75);

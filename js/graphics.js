@@ -40,7 +40,7 @@ var Graphics = function Graphics() {
 
     var angle = 20;
     function draw () {
-        cameraAngle[1]++;
+        cameraAngle[1] += 0.5;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadIdentity();
