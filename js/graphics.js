@@ -16,6 +16,8 @@ var Graphics = function Graphics() {
     var cameraAngle = [35, 45, 0];
     var cameraPosition = [0.0, -2, -50.0];
 
+    var focus = { position: [0, 0, 0] };
+
     function initWebGL() {
         gl = null;
 
@@ -23,10 +25,8 @@ var Graphics = function Graphics() {
             gl = canvas.getContext("webgl");
         }
         catch (e) {
-        }
-
-        if (!gl) {
             alert("Unable to initialize WebGL. Your browser may not support it.");
+            throw e;
         }
     }
 
@@ -275,6 +275,14 @@ var Graphics = function Graphics() {
         _.pushAll(entities, newEntities);
     }
 
+    function setFocus(newFocus) {
+        focus = newFocus;
+    }
+
+    function getCanvas() {
+        return canvas;
+    }
+
     return {
         start: start,
         draw : draw,
@@ -282,6 +290,8 @@ var Graphics = function Graphics() {
         getCameraAngle : getCameraAngle,
         getViewMatrix: loadCameraMatrix,
         addEntity : addEntity,
-        addEntities : addEntities
+        addEntities: addEntities,
+        setFocus: setFocus,
+        getCanvas: getCanvas
     }
 };
