@@ -145,12 +145,12 @@ var Game = function () {
 
         var plane = createPlane(mapScale);
         for (var i = 0; i < plane.length; i++) {
-            addEntity(models.cube.scale([mapScale]), textures.box, plane[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
+            addEntity(models.cube, textures.box, plane[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
         }
 
         var map = createMap(mapScale);
         for (var i = 0; i < map.length; i++) {
-            addEntity(models.cube.scale([mapScale]), textures.box, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
+            addEntity(models.cube, textures.box, map[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
         }
 
     }
