@@ -52,7 +52,7 @@ function Physics() {
                 for (var i = 0; i < 3; i++) {
                     if (collisionNormal[i] != 0) {
                         var normalSign = collisionNormal[i] > 0 ? 1 : -1;
-                        movingPart.velocity[i] = normalSign * Math.abs(movingPart.velocity[i]);
+                        movingPart.velocity[i] = normalSign * Math.abs(movingPart.velocity[i]) * 0.7;
                     }
                 }
             }

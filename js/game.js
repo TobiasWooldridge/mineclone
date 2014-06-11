@@ -3,14 +3,13 @@ var Game = function () {
     var graphics;
 
     function tick () {
-        graphics.draw();
+        graphics.getCameraAngle()[1] -= 0.2;
 
-        var gravity = normalize(graphics.getCameraAngle());
-
-        // Use a fixed value for now while I work out the correct maths for camera-oriented gravity
-        gravity = [0, -1, 0];
+        var mvMatrix = graphics.getViewMatrix().elements;
+        gravity = scaleVector(normalize([-mvMatrix[1][0], -mvMatrix[1][1], -mvMatrix[1][2]]), 5);
 
         physics.tick(gravity);
+        graphics.draw();
     }
 
     function createPlane(halfSize) {
@@ -84,7 +83,7 @@ var Game = function () {
 
         var sphereScale = 1;
 
-        addEntity(models.sphere, textures.solid, [0, 3, 0], {}, { type: "sphere", radius: sphereScale, velocity: [4, 0, -2] });
+        addEntity(models.sphere, textures.solid, [0, 3, 0], {}, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
 
         var mapScale = 1;
 

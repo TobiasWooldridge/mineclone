@@ -13,7 +13,7 @@ var Graphics = function Graphics() {
     var entities = [];
     var textures = {};
 
-    var cameraAngle = [45, 45, 0];
+    var cameraAngle = [35, 45, 0];
     var cameraPosition = [0.0, -2, -50.0];
 
     function initWebGL() {
@@ -38,48 +38,49 @@ var Graphics = function Graphics() {
         perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
     }
 
-    var angle = 20;
     function draw () {
-        cameraAngle[1] += 0.5;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+        loadCameraMatrix();
+
+        // Draw all entities
+        for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
+            var entity = entities[entityIndex];
+
+            mvScope(function () {
+                mvTranslate(entity.position);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
+                gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
+                gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
+                gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+
+                // Set the texture
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, entity.sharedProperties.colliding > 0 ? textures.boxRed : entity.texture);
+                gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
+
+                setMatrixUniforms();
+                gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
+            });
+        }
+    }
+
+    function loadCameraMatrix() {
         loadIdentity();
 
-        mvScope(function() {
-            mvTranslate(cameraPosition);
-            mvRotate(cameraAngle[0], [1, 0, 0]);
-            mvRotate(cameraAngle[1], [0, 1, 0]);
-            mvRotate(cameraAngle[2], [0, 0, 1]);
+        mvTranslate(cameraPosition);
+        mvRotate(cameraAngle[0], [1, 0, 0]);
+        mvRotate(cameraAngle[1], [0, 1, 0]);
+        mvRotate(cameraAngle[2], [0, 0, 1]);
 
-            // Draw all entities
-            for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
-                var entity = entities[entityIndex];
-
-                mvScope(function () {
-                    mvTranslate(entity.position);
-
-                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
-                    gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
-                    gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-
-                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
-                    gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
-
-                    // Set the texture
-                    gl.activeTexture(gl.TEXTURE0);
-                    gl.bindTexture(gl.TEXTURE_2D, entity.sharedProperties.colliding > 0 ? textures.boxRed: entity.texture);
-                    gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
-
-                    setMatrixUniforms();
-                    gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
-                });
-            }
-
-        });
+        return mvMatrix;
     }
 
     function getCameraAngle() {
@@ -279,6 +280,7 @@ var Graphics = function Graphics() {
         draw : draw,
         initTextures : initTextures,
         getCameraAngle : getCameraAngle,
+        getViewMatrix: loadCameraMatrix,
         addEntity : addEntity,
         addEntities : addEntities
     }
