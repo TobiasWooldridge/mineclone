@@ -2,12 +2,28 @@ var Game = function () {
     var physics;
     var graphics;
 
+    var models;
+    var textures;
+
+    var fpsTimes = [];
+    var fpsIdx = 0;
+
     function tick () {
         var mvMatrix = graphics.getViewMatrix().elements;
         gravity = scaleVector(normalize([-mvMatrix[1][0], -mvMatrix[1][1], -mvMatrix[1][2]]), 5);
 
         physics.tick(gravity);
+
         graphics.draw();
+
+        var fpsTime = performance.now();
+        fpsTimes[fpsIdx] = fpsTime;
+        fpsIdx++;
+        if (fpsIdx >= 60) {
+            // Log FPS
+//            console.log(60000/(fpsTimes[59] - fpsTimes[0]));
+            fpsIdx = 0;
+        }
     }
 
     function createPlane(halfSize) {
@@ -37,8 +53,8 @@ var Game = function () {
             [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
@@ -114,18 +130,11 @@ var Game = function () {
         }, false);
 
         canvas.addEventListener("mousewheel", function (event) {
-            graphics.getCameraOffset()[2] += event.wheelDelta / 50;
+            graphics.zoom(event.wheelDelta > 0 ? 3 : -3);
         }, false);
     }
 
-    function start(models, images) {
-        physics = Physics();
-
-        graphics = Graphics();
-        graphics.start();
-        var textures = graphics.initTextures(images);
-        attachUIEvents(graphics.getCanvas());
-
+    function loadLevel1() {
         var sphereScale = 1;
 
         var sphere = addEntity(models.sphere, textures.solid, [0, 3, 0], {}, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
@@ -143,6 +152,21 @@ var Game = function () {
         for (var i = 0; i < map.length; i++) {
             addEntity(models.cube.scale([mapScale]), textures.box, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
         }
+
+    }
+
+    function start(m, images) {
+        physics = Physics();
+
+        graphics = Graphics();
+        graphics.start();
+
+        models = m;
+        textures = graphics.initTextures(images);
+
+        attachUIEvents(graphics.getCanvas());
+
+        loadLevel1();
 
         setInterval(tick, 1000 / 75);
     }

@@ -3,11 +3,8 @@ var gl;
 var Graphics = function Graphics() {
     var canvas;
 
-    var mvMatrix;
     var shaderProgram;
-    var vertexPositionAttribute;
-    var vertexNormalAttribute;
-    var textureCoordAttribute;
+    var mvMatrix;
     var perspectiveMatrix;
 
     var entities = [];
@@ -42,34 +39,50 @@ var Graphics = function Graphics() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadCameraMatrix();
+        setPerspectiveMatrixUniform();
+
+        var tickStart = performance.now();
+
+        var model, oldModel;
+        var texture, oldTexture;
 
         // Draw all entities
         for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
             var entity = entities[entityIndex];
 
+            model = entity.model;
+            texture = entity.sharedProperties.colliding > 0 ? textures.boxRed : entity.texture;
+
             mvScope(function () {
+                if (model != oldModel) {
+                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
+                    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
+                    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                    gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
+                    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
+                }
+
+                if (texture != oldTexture) {
+                    // Set the texture
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    gl.uniform1i(shaderProgram.samplerUniform, 0);
+                }
+
                 mvTranslate(entity.position);
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
-                gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, entity.normalBuffer);
-                gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, entity.textureCoordBuffer);
-                gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
-
-                // Set the texture
-                gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, entity.sharedProperties.colliding > 0 ? textures.boxRed : entity.texture);
-                gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, entity.vertexIndexBuffer);
-
                 setMatrixUniforms();
                 gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
             });
+
+            oldModel = model;
+            oldTexture = texture;
         }
+//        console.log("Graphics: ", performance.now() - tickStart);
     }
 
     function loadCameraMatrix() {
@@ -104,14 +117,18 @@ var Graphics = function Graphics() {
 
         gl.useProgram(shaderProgram);
 
-        vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-        gl.enableVertexAttribArray(vertexPositionAttribute);
+        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-        vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-        gl.enableVertexAttribArray(vertexNormalAttribute);
+        shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+        gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
 
-        textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-        gl.enableVertexAttribArray(textureCoordAttribute);
+        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+        shaderProgram.pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        shaderProgram.mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        shaderProgram.nUniform = gl.getUniformLocation(shaderProgram, "uNormalMatrix");
     }
 
     function getShader(gl, id) {
@@ -155,7 +172,6 @@ var Graphics = function Graphics() {
         gl.compileShader(shader);
 
         // See if it compiled successfully
-
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
             return null;
@@ -198,17 +214,13 @@ var Graphics = function Graphics() {
         multMatrix(Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4());
     }
 
+    function setPerspectiveMatrixUniform() {
+        gl.uniformMatrix4fv(shaderProgram.pUniform, false, new Float32Array(perspectiveMatrix.flatten()));
+    }
+
     function setMatrixUniforms() {
-        var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-        gl.uniformMatrix4fv(pUniform, false, new Float32Array(perspectiveMatrix.flatten()));
-
-        var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-        gl.uniformMatrix4fv(mvUniform, false, new Float32Array(mvMatrix.flatten()));
-
-        var normalMatrix = mvMatrix.inverse();
-        normalMatrix = normalMatrix.transpose();
-        var nUniform = gl.getUniformLocation(shaderProgram, "uNormalMatrix");
-        gl.uniformMatrix4fv(nUniform, false, new Float32Array(normalMatrix.flatten()));
+        gl.uniformMatrix4fv(shaderProgram.mvUniform, false, new Float32Array(mvMatrix.flatten()));
+        gl.uniformMatrix4fv(shaderProgram.nUniform, false, new Float32Array(mvMatrix.inverse().transpose().flatten()));
     }
 
     var mvMatrixStack = [];
@@ -254,20 +266,23 @@ var Graphics = function Graphics() {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
 
-        // Update canvas size whenever window is resized
-        window.onresize = function() {
+        function resize(event) {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             gl.viewport(0, 0, window.innerWidth, window.innerHeight);
             updatePerspectiveMatrix();
         }
-        window.onresize();
+
+        // Update canvas size whenever window is resized
+        window.addEventListener("resize", resize, false);
+        resize();
 
         initShaders();
     }
 
-    function getCameraOffset() {
-        return cameraPosition;
+    function zoom(by) {
+        cameraPosition[2] = Math.max(-100, Math.min(cameraPosition[2] + by, -10));
+        console.log(by, cameraPosition[2]);
     }
 
     function addEntity(entity) {
@@ -291,7 +306,7 @@ var Graphics = function Graphics() {
         draw : draw,
         initTextures : initTextures,
         getCameraAngle : getCameraAngle,
-        getCameraOffset: getCameraOffset,
+        zoom: zoom,
         getViewMatrix: loadCameraMatrix,
         addEntity : addEntity,
         addEntities: addEntities,
