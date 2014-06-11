@@ -13,18 +13,14 @@ function Physics() {
 
         // Update the velocity for each non-stationary entity
         for (var i = 0; i < movingParts.length; i++) {
-            movingParts[i].accelerate(gravity, timeDelta);
             movingParts[i].move(timeDelta);
-
-
-            if (movingParts[i].position[1] < -5) {
-                movingParts[i].position[1] = 5;
-                movingParts[i].velocity[1] = 0;
-            }
         }
 
         processCollisions();
 
+        for (var i = 0; i < movingParts.length; i++) {
+            movingParts[i].accelerate(gravity, timeDelta);
+        }
     }
 
     function processCollisions() {
@@ -47,12 +43,18 @@ function Physics() {
             }
 
             if (normals.length) {
-                var contactNormal = normalize(normals.reduce(addVector, [0, 0, 0]));
+                var contactNormal = normals.reduce(addVector, [0, 0, 0]);
 
-                var vr = scaleVector(contactNormal, dot(contactNormal, movingPart.velocity));
-                var vt = subtractVector(movingPart.velocity, vr);
+                for (var i = 0; i < 3; i++) {
+                    if (contactNormal[i] != 0) {
+                        movingPart.velocity[i] *= -0.99;
+                    }
+                }
 
-                movingPart.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
+//                var vr = scaleVector(contactNormal, dot(contactNormal, movingPart.velocity) * 0.99);
+//                var vt = subtractVector(movingPart.velocity, vr);
+//
+//                movingPart.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
             }
         }
     }
@@ -99,20 +101,31 @@ function Physics() {
 
         var maxIdx = 0;
         for (var i = 0; i < oldNormal.length; i++) {
-            if (Math.max(oldNormal[i]) > Math.max(oldNormal[maxIdx])) {
+            if (Math.abs(oldNormal[i]) > Math.abs(oldNormal[maxIdx])) {
                 maxIdx = i;
             }
         }
 
 
+        var sign = oldNormal[maxIdx]/(Math.abs(oldNormal[maxIdx]));
+
         contactNormal = [0, 0, 0];
-        contactNormal[maxIdx] = oldNormal[maxIdx]/(Math.abs(oldNormal[maxIdx]));
+        contactNormal[maxIdx] = sign;
 
 
         // Move the sphere off of the box
-        sphere.position[maxIdx] = box.position[maxIdx] + contactNormal[maxIdx] * (sphere.radius + box.halfSize[maxIdx]);
+//        console.log(maxIdx);
+//        console.log(oldNormal);
+//        console.log(contactNormal);
+//        console.log(sphere.position);
+        sphere.position[maxIdx] = box.position[maxIdx] + sign * (sphere.radius + box.halfSize[maxIdx]);
+//        console.log(sphere.position);
+//        console.log("Box: " + box.position);
+//        console.log("----");
 
         box.sharedProperties.colliding = 20;
+
+        detectSphereBoxCollision(sphere, box);
 
         return contactNormal;
     }

@@ -13,8 +13,8 @@ var Graphics = function Graphics() {
     var entities = [];
     var textures = {};
 
-    var cameraAngle = [30, 45, 0];
-    var cameraPosition = [0.0, -2, -30.0];
+    var cameraAngle = [45, 45, 0];
+    var cameraPosition = [0.0, -2, -50.0];
 
     function initWebGL() {
         gl = null;

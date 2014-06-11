@@ -84,18 +84,18 @@ var Game = function () {
 
         var sphereScale = 1;
 
-        addEntity(models.sphere, textures.solid, [0, 3, 0], {},  { type: "sphere", radius : sphereScale, velocity : [1, 0, 0.5] });
+        addEntity(models.sphere, textures.solid, [0, 3, 0], {},  { type: "sphere", radius : sphereScale, velocity : [2, 0, -1] });
 
         var mapScale = 1;
 
         var plane = createPlane(mapScale);
         for (var i = 0; i < plane.length; i++) {
-            addEntity(models.cube.scale([mapScale * 0.9]), textures.box, plane[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
+            addEntity(models.cube.scale([mapScale]), textures.box, plane[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
         }
 
         var map = createMap(mapScale);
         for (var i = 0; i < map.length; i++) {
-            addEntity(models.cube.scale([mapScale * 0.9]), textures.box, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
+            addEntity(models.cube.scale([mapScale]), textures.box, map[i], {}, { stationary: true, type: "box", halfSize : [mapScale, mapScale, mapScale] });
         }
 
         setInterval(tick, 1000 / 75);
