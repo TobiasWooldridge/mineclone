@@ -32,7 +32,13 @@ var Graphics = function Graphics() {
         var aspectRatio = canvas.width/canvas.height;
         var minRenderDistance = 0.1;
         var maxRenderDistance = 200;
-        perspectiveMatrix = makePerspective(fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
+
+        var ymax = minRenderDistance * Math.tan(fieldOfView * Math.PI / 360.0);
+        var ymin = -ymax;
+        var xmin = ymin * aspectRatio;
+        var xmax = ymax * aspectRatio;
+
+        perspectiveMatrix = makeFrustum(xmin, xmax, ymin, ymax, minRenderDistance, maxRenderDistance);
     }
 
     function draw () {
@@ -215,7 +221,7 @@ var Graphics = function Graphics() {
     }
 
     function setPerspectiveMatrixUniform() {
-        gl.uniformMatrix4fv(shaderProgram.pUniform, false, new Float32Array(perspectiveMatrix.flatten()));
+        gl.uniformMatrix4fv(shaderProgram.pUniform, false, new Float32Array(perspectiveMatrix));
     }
 
     function setMatrixUniforms() {
