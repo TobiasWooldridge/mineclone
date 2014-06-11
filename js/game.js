@@ -88,14 +88,15 @@ var Game = function () {
             startPoint = toPoint;
         }
 
+
         var mouseDown = false;
 
         var startPoint = [0, 0];
 
         canvas.addEventListener("mousedown", function (event) {
             mouseDown = true;
+
             startPoint = getPoint(event, canvas);
-            console.log(startPoint);
         }, false);
 
         canvas.addEventListener("mousemove", function (event) {
