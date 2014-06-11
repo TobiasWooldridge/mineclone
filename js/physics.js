@@ -51,14 +51,10 @@ function Physics() {
 
                 for (var i = 0; i < 3; i++) {
                     if (collisionNormal[i] != 0) {
-                        movingPart.velocity[i] *= -0.97;
+                        var normalSign = collisionNormal[i] > 0 ? 1 : -1;
+                        movingPart.velocity[i] = normalSign * Math.abs(movingPart.velocity[i]);
                     }
                 }
-
-//                var vr = scaleVector(collisionNormal, dot(collisionNormal, movingPart.velocity) * 0.99);
-//                var vt = subtractVector(movingPart.velocity, vr);
-//
-//                movingPart.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
             }
         }
     }
