@@ -5,7 +5,7 @@ function Physics() {
 
     var movingParts = [];
 
-    var collisionDamping = 0.7;
+    var collisionDamping = 0.4;
 
     function tick (gravity) {
         var currentTime = (new Date).getTime();
