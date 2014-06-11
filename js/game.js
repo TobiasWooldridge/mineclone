@@ -84,7 +84,7 @@ var Game = function () {
 
         var sphereScale = 1;
 
-        addEntity(models.sphere, textures.solid, [0, 3, 0], {},  { type: "sphere", radius : sphereScale, velocity : [2, 0, -1] });
+        addEntity(models.sphere, textures.solid, [0, 3, 0], {}, { type: "sphere", radius: sphereScale, velocity: [4, 0, -2] });
 
         var mapScale = 1;
 
