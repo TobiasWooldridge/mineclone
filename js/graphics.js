@@ -266,6 +266,9 @@ var Graphics = function Graphics() {
         initShaders();
     }
 
+    function getCameraOffset() {
+        return cameraPosition;
+    }
 
     function addEntity(entity) {
         entities.push(entity);
@@ -288,6 +291,7 @@ var Graphics = function Graphics() {
         draw : draw,
         initTextures : initTextures,
         getCameraAngle : getCameraAngle,
+        getCameraOffset: getCameraOffset,
         getViewMatrix: loadCameraMatrix,
         addEntity : addEntity,
         addEntities: addEntities,

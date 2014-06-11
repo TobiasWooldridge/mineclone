@@ -37,8 +37,8 @@ var Game = function () {
             [1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
@@ -82,8 +82,8 @@ var Game = function () {
         function handleMovement(toPoint) {
             var movement = subtractVector(startPoint, toPoint);
 
-            graphics.getCameraAngle()[1] -= (movement[0] * 180);
-            graphics.getCameraAngle()[0] -= (movement[1] * 180);
+            graphics.getCameraAngle()[1] += (movement[0] * -180);
+            graphics.getCameraAngle()[0] += (movement[1] * -180);
 
             startPoint = toPoint;
         }
@@ -111,6 +111,10 @@ var Game = function () {
             mouseDown = false;
 
             handleMovement(getPoint(event, canvas));
+        }, false);
+
+        canvas.addEventListener("mousewheel", function (event) {
+            graphics.getCameraOffset()[2] += event.wheelDelta / 50;
         }, false);
     }
 
