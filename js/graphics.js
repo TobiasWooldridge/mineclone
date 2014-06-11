@@ -53,7 +53,7 @@ var Graphics = function Graphics() {
             model = entity.model;
             texture = entity.sharedProperties.colliding > 0 ? textures.boxRed : entity.texture;
 
-            mvScope(function () {
+            mvScope(function renderEntity() {
                 if (model != oldModel) {
                     gl.bindBuffer(gl.ARRAY_BUFFER, entity.vertexBuffer);
                     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);

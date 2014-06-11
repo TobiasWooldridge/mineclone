@@ -1,4 +1,3 @@
-// augment Sylvester some
 Matrix.Translation = function (v) {
     if (v.elements.length == 2) {
         var r = Matrix.I(3);
@@ -62,87 +61,10 @@ Matrix.prototype.ensure4x4 = function () {
     return this;
 };
 
-Matrix.prototype.make3x3 = function () {
-    if (this.elements.length != 4 ||
-        this.elements[0].length != 4)
-        return null;
-
-    return Matrix.create([
-        [this.elements[0][0], this.elements[0][1], this.elements[0][2]],
-        [this.elements[1][0], this.elements[1][1], this.elements[1][2]],
-        [this.elements[2][0], this.elements[2][1], this.elements[2][2]]
-    ]);
-};
-
 Vector.prototype.flatten = function () {
     return this.elements;
 };
 
-function mht(m) {
-    var s = "";
-    if (m.length == 16) {
-        for (var i = 0; i < 4; i++) {
-            s += "<span style='font-family: monospace'>[" + m[i * 4 + 0].toFixed(4) + "," + m[i * 4 + 1].toFixed(4) + "," + m[i * 4 + 2].toFixed(4) + "," + m[i * 4 + 3].toFixed(4) + "]</span><br>";
-        }
-    } else if (m.length == 9) {
-        for (var i = 0; i < 3; i++) {
-            s += "<span style='font-family: monospace'>[" + m[i * 3 + 0].toFixed(4) + "," + m[i * 3 + 1].toFixed(4) + "," + m[i * 3 + 2].toFixed(4) + "]</font><br>";
-        }
-    } else {
-        return m.toString();
-    }
-    return s;
-}
-
-//
-// gluLookAt
-//
-function makeLookAt(ex, ey, ez, cx, cy, cz, ux, uy, uz) {
-    var eye = $V([ex, ey, ez]);
-    var center = $V([cx, cy, cz]);
-    var up = $V([ux, uy, uz]);
-
-    var mag;
-
-    var z = eye.subtract(center).toUnitVector();
-    var x = up.cross(z).toUnitVector();
-    var y = z.cross(x).toUnitVector();
-
-    var m = $M([
-        [x.e(1), x.e(2), x.e(3), 0],
-        [y.e(1), y.e(2), y.e(3), 0],
-        [z.e(1), z.e(2), z.e(3), 0],
-        [0, 0, 0, 1]
-    ]);
-
-    var t = $M([
-        [1, 0, 0, -ex],
-        [0, 1, 0, -ey],
-        [0, 0, 1, -ez],
-        [0, 0, 0, 1]
-    ]);
-    return m.x(t);
-}
-
-//
-// glOrtho
-//
-function makeOrtho(left, right, bottom, top, znear, zfar) {
-    var tx = -(right + left) / (right - left);
-    var ty = -(top + bottom) / (top - bottom);
-    var tz = -(zfar + znear) / (zfar - znear);
-
-    return $M([
-        [2 / (right - left), 0, 0, tx],
-        [0, 2 / (top - bottom), 0, ty],
-        [0, 0, -2 / (zfar - znear), tz],
-        [0, 0, 0, 1]
-    ]);
-}
-
-//
-// gluPerspective
-//
 function makePerspective(fovy, aspect, znear, zfar) {
     var ymax = znear * Math.tan(fovy * Math.PI / 360.0);
     var ymin = -ymax;
@@ -152,9 +74,6 @@ function makePerspective(fovy, aspect, znear, zfar) {
     return makeFrustum(xmin, xmax, ymin, ymax, znear, zfar);
 }
 
-//
-// glFrustum
-//
 function makeFrustum(left, right, bottom, top, znear, zfar) {
     var X = 2 * znear / (right - left);
     var Y = 2 * znear / (top - bottom);
@@ -170,20 +89,3 @@ function makeFrustum(left, right, bottom, top, znear, zfar) {
         [0, 0, -1, 0]
     ]);
 }
-
-//
-// glOrtho
-//
-function makeOrtho(left, right, bottom, top, znear, zfar) {
-    var tx = -(right + left) / (right - left);
-    var ty = -(top + bottom) / (top - bottom);
-    var tz = -(zfar + znear) / (zfar - znear);
-
-    return $M([
-        [2 / (right - left), 0, 0, tx],
-        [0, 2 / (top - bottom), 0, ty],
-        [0, 0, -2 / (zfar - znear), tz],
-        [0, 0, 0, 1]
-    ]);
-}
-
