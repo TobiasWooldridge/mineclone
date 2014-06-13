@@ -48,7 +48,8 @@
         solidRed : './textures/solid_red.png',
         box : './textures/box.png',
         boxRed : './textures/box_red.png',
-        cubeDims : './textures/cubeDims.png'
+        cubeDims: './textures/cubeDims.png',
+        ball: './textures/ball.png'
     };
 
 

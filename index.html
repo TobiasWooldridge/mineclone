@@ -55,8 +55,8 @@ void main() {
                       specular * specColor, 1.0) *
                       texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
 
-//  gl_FragColor[0] *= uGlow;
-  gl_FragColor[1] *= uGlow;
+  gl_FragColor[0] *= uGlow;
+//  gl_FragColor[1] *= uGlow;
 //  gl_FragColor[2] *= uGlow;
 }
 </script>
