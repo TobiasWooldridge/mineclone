@@ -42,6 +42,7 @@ var Graphics = function Graphics() {
     }
 
     function draw () {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadCameraMatrix();
         setPerspectiveMatrixUniform();
@@ -49,8 +50,9 @@ var Graphics = function Graphics() {
 
         var blend = true;
         if (blend) {
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.disable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
         }
         else {
             gl.disable(gl.BLEND);
