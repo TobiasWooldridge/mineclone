@@ -26,12 +26,12 @@ varying vec3 vertexPos;
 varying highp vec2 vTextureCoord;
 
 uniform sampler2D uSampler;
-uniform float uGlow;
+uniform vec4 uTint;
 
 const vec3 lightPos = vec3(1.0,1.0,1.0);
-const vec3 ambientColor = vec3(0.3, 0.3, 0.3);
-const vec3 diffuseColor = vec3(0.7, 0.7, 0.7);
-const vec3 specColor = vec3(1.0, 1.0, 1.0);
+const vec3 ambientColor = vec3(0.01, 0.01, 0.01);
+const vec3 diffuseColor = vec3(0.05, 0.05, 0.05);
+const vec3 specColor = vec3(0.9, 0.8, 1.0);
 
 void main() {
 
@@ -50,14 +50,9 @@ void main() {
     specular = pow(specAngle, 16.0);
   }
 
-  gl_FragColor = vec4(ambientColor +
-                      lambertian * diffuseColor +
-                      specular * specColor, 1.0) *
-                      texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-
-  gl_FragColor[0] *= uGlow;
-//  gl_FragColor[1] *= uGlow;
-//  gl_FragColor[2] *= uGlow;
+  gl_FragColor = vec4(ambientColor + lambertian * diffuseColor + specular * specColor, 1.0) *
+                      texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) *
+                      vec4(uTint);
 }
 </script>
 <script id="blinnPhong-vs" type="x-shader/x-vertex">

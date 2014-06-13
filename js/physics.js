@@ -7,7 +7,7 @@ function Physics() {
 
     var collisionDamping = 0.4;
 
-    function tick (gravity) {
+    function tick(gravity) {
         var currentTime = (new Date).getTime();
         var timeDelta = Math.min(currentTime - lastUpdateTime, 50);
         lastUpdateTime = currentTime;
@@ -41,7 +41,7 @@ function Physics() {
 
                 if (normal) {
                     normals.push(normal);
-                    entity.sharedProperties.colliding = 60;
+                    entity.sharedProperties.colliding = 100;
                 }
                 else {
                     entity.sharedProperties.colliding -= 1;
@@ -121,7 +121,7 @@ function Physics() {
 
     return {
         tick: tick,
-        addEntity : addEntity,
-        addEntities : addEntities
+        addEntity: addEntity,
+        addEntities: addEntities
     }
 };

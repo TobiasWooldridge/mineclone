@@ -42,16 +42,25 @@ var Graphics = function Graphics() {
     }
 
     function draw () {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadCameraMatrix();
         setPerspectiveMatrixUniform();
 
-        var tickStart = performance.now();
+
+        var blend = true;
+        if (blend) {
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.enable(gl.BLEND);
+        }
+        else {
+            gl.disable(gl.BLEND);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+        }
 
         var model, oldModel;
         var texture, oldTexture;
-        var glow;
+        var tint;
 
         // Draw all entities
         for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
@@ -81,14 +90,14 @@ var Graphics = function Graphics() {
                     gl.uniform1i(shaderProgram.samplerUniform, 0);
                 }
 
+                tint = [1, 1, 1, 1];
+
                 if (entity.sharedProperties.colliding > 0) {
-                    glow = 1 + Math.max(entity.sharedProperties.colliding, 1) / 60;
-                }
-                else {
-                    glow = 1;
+                    var glow = Math.max(entity.sharedProperties.colliding, 1) / 100;
+                    tint = [tint[0] + glow, tint[1] - glow / 2, tint[2] - glow / 2, 1];
                 }
 
-                gl.uniform1f(shaderProgram.glowUniform, glow);
+                gl.uniform4f(shaderProgram.tintUniform, tint[0], tint[1], tint[2], tint[3]);
 
                 mvTranslate(entity.position);
                 mvTranslate(focus.position.map(function (x) {
@@ -101,7 +110,6 @@ var Graphics = function Graphics() {
             oldModel = model;
             oldTexture = texture;
         }
-//        console.log("Graphics: ", performance.now() - tickStart);
     }
 
     function loadCameraMatrix() {
@@ -145,7 +153,7 @@ var Graphics = function Graphics() {
         shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
-        shaderProgram.glowUniform = gl.getUniformLocation(shaderProgram, "uGlow");
+        shaderProgram.tintUniform = gl.getUniformLocation(shaderProgram, "uTint");
 
         shaderProgram.pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
@@ -281,11 +289,9 @@ var Graphics = function Graphics() {
         canvas = document.getElementById("glcanvas");
 
         initWebGL(canvas);
-
         gl.clearColor(0.509, 0.792, 0.98, 1.0);
         gl.clearDepth(1.0);
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
+
 
         function resize(event) {
             canvas.width = window.innerWidth;
