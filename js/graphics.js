@@ -81,6 +81,9 @@ var Graphics = function Graphics() {
                 }
 
                 mvTranslate(entity.position);
+                mvTranslate(focus.position.map(function (x) {
+                    return (-1 * x);
+                }));
                 setMatrixUniforms();
                 gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
             });
