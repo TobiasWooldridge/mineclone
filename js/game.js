@@ -92,7 +92,7 @@ var Game = function () {
 
     function attachUIEvents(canvas) {
         function getPoint(event, canvas) {
-            return [event.x / canvas.width, event.y / canvas.height];
+            return [event.clientX / canvas.width, event.clientY / canvas.height];
         }
 
         function handleMovement(toPoint) {
@@ -131,6 +131,9 @@ var Game = function () {
 
         canvas.addEventListener("mousewheel", function (event) {
             graphics.zoom(event.wheelDelta > 0 ? 3 : -3);
+        }, false);
+        canvas.addEventListener("DOMMouseScroll", function (event) {
+            graphics.zoom(event.detail < 0 ? 3 : -3);
         }, false);
     }
 
