@@ -51,13 +51,14 @@ var Graphics = function Graphics() {
 
         var model, oldModel;
         var texture, oldTexture;
+        var glow;
 
         // Draw all entities
         for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
             var entity = entities[entityIndex];
 
             model = entity.model;
-            texture = entity.sharedProperties.colliding > 0 ? textures.boxRed : entity.texture;
+            texture = entity.texture;
 
             mvScope(function renderEntity() {
                 if (model != oldModel) {
@@ -79,6 +80,15 @@ var Graphics = function Graphics() {
                     gl.bindTexture(gl.TEXTURE_2D, texture);
                     gl.uniform1i(shaderProgram.samplerUniform, 0);
                 }
+
+                if (entity.sharedProperties.colliding > 0) {
+                    glow = 1 + Math.max(entity.sharedProperties.colliding, 1) / 60;
+                }
+                else {
+                    glow = 1;
+                }
+
+                gl.uniform1f(shaderProgram.glowUniform, glow);
 
                 mvTranslate(entity.position);
                 mvTranslate(focus.position.map(function (x) {
@@ -134,6 +144,8 @@ var Graphics = function Graphics() {
 
         shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+        shaderProgram.glowUniform = gl.getUniformLocation(shaderProgram, "uGlow");
 
         shaderProgram.pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
