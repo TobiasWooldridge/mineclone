@@ -9,8 +9,8 @@ var Game = function () {
     var fpsIdx = 0;
 
     function tick () {
-        var mvMatrix = graphics.getViewMatrix().elements;
-        gravity = scaleVector(normalize([-mvMatrix[1][0], -mvMatrix[1][1], -mvMatrix[1][2]]), 5);
+        var mvMatrix = graphics.getViewMatrix();
+        gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
 
         physics.tick(gravity);
 
@@ -21,7 +21,7 @@ var Game = function () {
         fpsIdx++;
         if (fpsIdx >= 60) {
             // Log FPS
-//            console.log(60000/(fpsTimes[59] - fpsTimes[0]));
+            console.log(60000 / (fpsTimes[59] - fpsTimes[0]));
             fpsIdx = 0;
         }
     }

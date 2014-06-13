@@ -4,8 +4,8 @@ var Graphics = function Graphics() {
     var canvas;
 
     var shaderProgram;
-    var mvMatrix;
-    var perspectiveMatrix;
+    var mvMatrix = mat4.create();
+    var perspectiveMatrix = mat4.create();
 
     var entities = [];
     var textures = {};
@@ -14,6 +14,8 @@ var Graphics = function Graphics() {
     var cameraPosition = [0.0, -2, -50.0];
 
     var focus = { position: [0, 0, 0] };
+
+    var blend = false;
 
     function initWebGL() {
         gl = null;
@@ -33,22 +35,15 @@ var Graphics = function Graphics() {
         var minRenderDistance = 0.1;
         var maxRenderDistance = 200;
 
-        var ymax = minRenderDistance * Math.tan(fieldOfView * Math.PI / 360.0);
-        var ymin = -ymax;
-        var xmin = ymin * aspectRatio;
-        var xmax = ymax * aspectRatio;
-
-        perspectiveMatrix = makeFrustum(xmin, xmax, ymin, ymax, minRenderDistance, maxRenderDistance);
+        mat4.perspective(perspectiveMatrix, fieldOfView, aspectRatio, minRenderDistance, maxRenderDistance);
+        gl.uniformMatrix4fv(shaderProgram.pUniform, false, new Float32Array(perspectiveMatrix));
     }
 
     function draw () {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadCameraMatrix();
-        setPerspectiveMatrixUniform();
 
-
-        var blend = true;
         if (blend) {
             gl.disable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
@@ -115,7 +110,7 @@ var Graphics = function Graphics() {
     }
 
     function loadCameraMatrix() {
-        loadIdentity();
+        mat4.identity(mvMatrix)
 
         mvTranslate(cameraPosition);
         mvRotate(cameraAngle[0], [1, 0, 0]);
@@ -233,58 +228,33 @@ var Graphics = function Graphics() {
         return textures;
     }
 
-    function loadIdentity() {
-        mvMatrix = Matrix.I(4);
-    }
-
-    function multMatrix(m) {
-        mvMatrix = mvMatrix.x(m);
-    }
-
     function mvTranslate(v) {
-        multMatrix(Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4());
-    }
-
-    function setPerspectiveMatrixUniform() {
-        gl.uniformMatrix4fv(shaderProgram.pUniform, false, new Float32Array(perspectiveMatrix));
+        mat4.translate(mvMatrix, mvMatrix, v);
     }
 
     function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.mvUniform, false, new Float32Array(mvMatrix.flatten()));
-        gl.uniformMatrix4fv(shaderProgram.nUniform, false, new Float32Array(mvMatrix.inverse().transpose().flatten()));
+        gl.uniformMatrix4fv(shaderProgram.mvUniform, false, new Float32Array(mvMatrix));
+
+
+        var mvMatrixInverseTranspose = mat4.create();
+        mat4.invert(mvMatrix, mvMatrixInverseTranspose);
+        mat4.transpose(mvMatrixInverseTranspose, mat4.clone(mvMatrixInverseTranspose));
+
+        gl.uniformMatrix4fv(shaderProgram.nUniform, false, new Float32Array(mvMatrixInverseTranspose));
+    }
+
+
+    var radConst = Math.PI / 180.0
+
+    function mvRotate(degrees, axis) {
+        mat4.rotate(mvMatrix, mvMatrix, degrees * radConst, axis);
     }
 
     var mvMatrixStack = [];
-
-    function mvPushMatrix(m) {
-        if (m) {
-            mvMatrixStack.push(m.dup());
-            mvMatrix = m.dup();
-        } else {
-            mvMatrixStack.push(mvMatrix.dup());
-        }
-    }
-
-    function mvPopMatrix() {
-        if (!mvMatrixStack.length) {
-            throw("Can't pop from an empty matrix stack.");
-        }
-
-        mvMatrix = mvMatrixStack.pop();
-        return mvMatrix;
-    }
-
-    function mvRotate(angle, v) {
-        var inRadians = angle * Math.PI / 180.0;
-
-        var m = Matrix.Rotation(inRadians, $V([v[0], v[1], v[2]])).ensure4x4();
-        multMatrix(m);
-    }
-
     function mvScope(fn) {
-        mvPushMatrix();
+        mvMatrixStack.push(mat4.clone(mvMatrix));
         fn();
-        mvPopMatrix();
+        mvMatrix = mvMatrixStack.pop();
     }
 
     function start() {
@@ -294,6 +264,7 @@ var Graphics = function Graphics() {
         gl.clearColor(0.509, 0.792, 0.98, 1.0);
         gl.clearDepth(1.0);
 
+        initShaders();
 
         function resize(event) {
             canvas.width = window.innerWidth;
@@ -306,7 +277,6 @@ var Graphics = function Graphics() {
         window.addEventListener("resize", resize, false);
         resize();
 
-        initShaders();
     }
 
     function zoom(by) {
