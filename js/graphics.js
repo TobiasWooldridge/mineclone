@@ -47,7 +47,7 @@ var Graphics = function Graphics() {
         if (blend) {
             gl.disable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
         else {
             gl.disable(gl.BLEND);
@@ -232,11 +232,10 @@ var Graphics = function Graphics() {
         mat4.translate(mvMatrix, mvMatrix, v);
     }
 
+    var mvMatrixInverseTranspose = mat4.create();
     function setMatrixUniforms() {
         gl.uniformMatrix4fv(shaderProgram.mvUniform, false, mvMatrix);
 
-
-        var mvMatrixInverseTranspose = mat4.create();
         mat4.invert(mvMatrixInverseTranspose, mvMatrix);
         mat4.transpose(mvMatrixInverseTranspose, mvMatrixInverseTranspose);
 
