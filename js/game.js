@@ -5,25 +5,30 @@ var Game = function () {
     var models;
     var textures;
 
-    var fpsTimes = [];
-    var fpsIdx = 0;
+//    var fpsTimes = [];
+//    var fpsIdx = 0;
 
     function tick () {
+        var start = performance.now();
         var mvMatrix = graphics.getViewMatrix();
         gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
 
         physics.tick(gravity);
+        var p = performance.now();
 
         graphics.draw();
+        var g = performance.now();
 
-        var fpsTime = performance.now();
-        fpsTimes[fpsIdx] = fpsTime;
-        fpsIdx++;
-        if (fpsIdx >= 60) {
-            // Log FPS
-            console.log(60000 / (fpsTimes[59] - fpsTimes[0]));
-            fpsIdx = 0;
-        }
+        console.log(p - start, g - p);
+
+//        var fpsTime = performance.now();
+//        fpsTimes[fpsIdx] = fpsTime;
+//        fpsIdx++;
+//        if (fpsIdx >= 60) {
+//            // Log FPS
+//            console.log(60000 / (fpsTimes[59] - fpsTimes[0]));
+//            fpsIdx = 0;
+//        }
     }
 
 
@@ -240,7 +245,7 @@ var Game = function () {
 
         loadLevel1();
 
-        setInterval(tick, 1000 / 75);
+        setInterval(tick, 1000 / 60);
     }
 
     return {

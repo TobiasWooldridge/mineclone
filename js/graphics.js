@@ -233,14 +233,14 @@ var Graphics = function Graphics() {
     }
 
     function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaderProgram.mvUniform, false, new Float32Array(mvMatrix));
+        gl.uniformMatrix4fv(shaderProgram.mvUniform, false, mvMatrix);
 
 
         var mvMatrixInverseTranspose = mat4.create();
-        mat4.invert(mvMatrix, mvMatrixInverseTranspose);
-        mat4.transpose(mvMatrixInverseTranspose, mat4.clone(mvMatrixInverseTranspose));
+        mat4.invert(mvMatrixInverseTranspose, mvMatrix);
+        mat4.transpose(mvMatrixInverseTranspose, mvMatrixInverseTranspose);
 
-        gl.uniformMatrix4fv(shaderProgram.nUniform, false, new Float32Array(mvMatrixInverseTranspose));
+        gl.uniformMatrix4fv(shaderProgram.nUniform, false, mvMatrixInverseTranspose);
     }
 
 
