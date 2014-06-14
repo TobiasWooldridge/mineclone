@@ -90,8 +90,8 @@ var Model = (function() {
                 var u = 1 - (longNumber / longitudeBands);
                 var v = 1 - (latNumber / latitudeBands);
 
-                vertices.push(x, y, z);
-                normals.push(x, y, z);
+                vertices.push(z, y, x);
+                normals.push(z, y, x);
                 vertexTextureCoords.push(u, v);
             }
         }

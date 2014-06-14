@@ -19,7 +19,7 @@ var Game = function () {
         graphics.draw();
         var g = performance.now();
 
-        console.log(p - start, g - p);
+//        console.log(p - start, g - p);
 
 //        var fpsTime = performance.now();
 //        fpsTimes[fpsIdx] = fpsTime;

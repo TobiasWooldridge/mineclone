@@ -15,7 +15,7 @@ var Graphics = function Graphics() {
 
     var focus = { position: [0, 0, 0] };
 
-    var blend = true;
+    var blend = false;
 
     function initWebGL() {
         gl = null;
@@ -43,17 +43,20 @@ var Graphics = function Graphics() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadCameraMatrix();
+        mvTranslate(focus.position.map(function (x) {
+            return -1 * x;
+        }));
 
-        if (blend) {
-            gl.disable(gl.DEPTH_TEST);
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        }
-        else {
-            gl.disable(gl.BLEND);
-            gl.enable(gl.DEPTH_TEST);
-            gl.depthFunc(gl.LEQUAL);
-        }
+
+//        var center = vec3.negate(vec3.create(), mvMatrix.subarray(12, 15));
+//        console.log(center);
+
+//        entities.sort(function (a, b) {
+//            var ad = vec3.squaredDistance(a.position, center);
+//            var bd = vec3.squaredDistance(b.position, center);
+//
+//            return bd - ad;
+//        });
 
         var model, oldModel;
         var texture, oldTexture;
@@ -97,9 +100,6 @@ var Graphics = function Graphics() {
                 gl.uniform4f(shaderProgram.tintUniform, tint[0], tint[1], tint[2], tint[3]);
 
                 mvTranslate(entity.position);
-                mvTranslate(focus.position.map(function (x) {
-                    return (-1 * x);
-                }));
                 setMatrixUniforms();
                 gl.drawElements(gl.TRIANGLES, entity.triangles * 3, gl.UNSIGNED_SHORT, 0);
             });
@@ -263,6 +263,21 @@ var Graphics = function Graphics() {
         gl.clearColor(0.509, 0.792, 0.98, 1.0);
         gl.clearDepth(1.0);
 
+
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+
+        if (blend) {
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
+        else {
+            gl.disable(gl.BLEND);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+        }
+
         initShaders();
 
         function resize(event) {
@@ -280,7 +295,6 @@ var Graphics = function Graphics() {
 
     function zoom(by) {
         cameraPosition[2] = Math.max(-100, Math.min(cameraPosition[2] + by, -10));
-        console.log(by, cameraPosition[2]);
     }
 
     function addEntity(entity) {
