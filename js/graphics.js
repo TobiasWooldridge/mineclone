@@ -10,10 +10,10 @@ var Graphics = function Graphics() {
     var entities = [];
     var textures = {};
 
-    var cameraAngle = [35, 45, 0];
-    var cameraPosition = [0.0, -2, -50.0];
+    var cameraAngle;
+    var cameraPosition;
 
-    var focus = { position: [0, 0, 0] };
+    var focus;
 
     var blend = false;
 
@@ -291,6 +291,15 @@ var Graphics = function Graphics() {
         window.addEventListener("resize", resize, false);
         resize();
 
+
+        reset();
+    }
+
+    function reset() {
+        entities.length = 0;
+        cameraAngle = [35, 45, 0];
+        cameraPosition = [0.0, -2, -50.0];
+        focus = { position: [0, 0, 0] };
     }
 
     function zoom(by) {
@@ -323,6 +332,7 @@ var Graphics = function Graphics() {
         addEntity : addEntity,
         addEntities: addEntities,
         setFocus: setFocus,
-        getCanvas: getCanvas
+        getCanvas: getCanvas,
+        reset: reset
     }
 };

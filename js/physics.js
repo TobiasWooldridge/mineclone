@@ -119,9 +119,16 @@ function Physics() {
         }
     }
 
+    function reset() {
+        lastUpdateTime = 0;
+        entities.length = 0;
+        movingParts.length = 0;
+    }
+
     return {
         tick: tick,
         addEntity: addEntity,
-        addEntities: addEntities
+        addEntities: addEntities,
+        reset: reset
     }
 };

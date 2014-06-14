@@ -5,6 +5,8 @@ var Game = function () {
     var models;
     var textures;
 
+    var levelTick;
+
 //    var fpsTimes = [];
 //    var fpsIdx = 0;
 
@@ -18,6 +20,11 @@ var Game = function () {
 
         graphics.draw();
         var g = performance.now();
+
+
+        if (levelTick != undefined) {
+            levelTick();
+        }
 
 //        console.log(p - start, g - p);
 
@@ -92,6 +99,9 @@ var Game = function () {
     }
 
     function loadLevel1() {
+        graphics.reset();
+        physics.reset();
+
         function createMap(halfSize, off, map) {
             var size = halfSize * 2;
             var offsets = [];
@@ -230,6 +240,12 @@ var Game = function () {
             addEntity(models.cube, textures.box, map[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
         }
 
+
+        levelTick = function level1Tick() {
+            if (vec3.distance(sphere.position, [0, 0, 0]) > 50) {
+                loadLevel1();
+            }
+        }
     }
 
     function start(m, images) {
