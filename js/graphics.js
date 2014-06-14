@@ -15,7 +15,7 @@ var Graphics = function Graphics() {
 
     var focus = { position: [0, 0, 0] };
 
-    var blend = false;
+    var blend = true;
 
     function initWebGL() {
         gl = null;
