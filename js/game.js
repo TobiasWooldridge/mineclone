@@ -52,15 +52,17 @@ var Game = function () {
     }
 
     function attachUIEvents(canvas) {
+        var mouseSens = 750;
+
         function getPoint(event, canvas) {
-            return [event.clientX / canvas.width, event.clientY / canvas.height];
+            return [event.clientX, event.clientY];
         }
 
         function handleMovement(toPoint) {
             var movement = subtractVector(startPoint, toPoint);
 
-            graphics.getCameraAngle()[1] += (movement[0] * -180);
-            graphics.getCameraAngle()[0] += (movement[1] * -180);
+            graphics.getCameraAngle()[1] += (movement[0] / mouseSens * -180);
+            graphics.getCameraAngle()[0] += (movement[1] / mouseSens * -180);
 
             startPoint = toPoint;
         }
@@ -93,6 +95,7 @@ var Game = function () {
         canvas.addEventListener("mousewheel", function (event) {
             graphics.zoom(event.wheelDelta > 0 ? 3 : -3);
         }, false);
+
         canvas.addEventListener("DOMMouseScroll", function (event) {
             graphics.zoom(event.detail < 0 ? 3 : -3);
         }, false);
