@@ -37,13 +37,14 @@ function createGraphicsEntity(baseEntity, texture, properties) {
         normalBuffer: normalBuffer,
         textureCoordBuffer: textureCoordBuffer,
         triangles: model.numTriangles,
-        texture: texture
+        texture: texture,
+        tint: [1, 1, 1, 1]
     };
 
 
     for (var property in properties) {
         if (properties.hasOwnProperty(property)) {
-            physicsEntity[property] = properties[property];
+            graphicsEntity[property] = properties[property];
         }
     }
 

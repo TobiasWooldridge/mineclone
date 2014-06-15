@@ -84,17 +84,19 @@ var Graphics = function Graphics() {
                 }
 
                 if (texture != oldTexture) {
-                    // Set the texture
+                    // TODO: Use texture units effectively
                     gl.activeTexture(gl.TEXTURE0);
                     gl.bindTexture(gl.TEXTURE_2D, texture);
                     gl.uniform1i(shaderProgram.samplerUniform, 0);
                 }
 
-                tint = [1, 1, 1, 1];
+                tint = entity.tint.slice();
 
                 if (entity.sharedProperties.colliding > 0) {
                     var glow = Math.max(entity.sharedProperties.colliding, 1) / 100;
-                    tint = [tint[0] + glow, tint[1] - glow / 2, tint[2] - glow / 2, 1];
+                    tint[0] += glow;
+                    tint[1] -= glow / 2;
+                    tint[2] -= glow / 2;
                 }
 
                 gl.uniform4f(shaderProgram.tintUniform, tint[0], tint[1], tint[2], tint[3]);

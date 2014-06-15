@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>vector.xyz</title>
@@ -10,14 +11,15 @@
         canvas#glcanvas {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
             cursor: pointer;
         }
     </style>
 </head>
-
 <body>
 <canvas id="glcanvas" width="1920" height="1080"></canvas>
-
 <script id="blinnPhong-fs" type="x-shader/x-fragment">
 precision mediump float;
 
@@ -108,6 +110,7 @@ void main(void) {
 <!-- Libraries -->
 <script src="js/lib/gl-matrix.js"></script>
 <script src="js/lib/async.js"></script>
+<script src="js/lib/curry.js"></script>
 
 <!-- My code -->
 <script src="js/util/friendly.js"></script>
@@ -124,6 +127,7 @@ void main(void) {
 
 <script src="js/graphics.js"></script>
 <script src="js/physics.js"></script>
+<script src="js/maze.js"></script>
 <script src="js/game.js"></script>
 
 <script src="js/bootstrap.js"></script>

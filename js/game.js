@@ -45,8 +45,8 @@ var Game = function () {
         var physicsEntity = createPhysicsEntity(baseEntity, physicsProperties);
         physics.addEntity(physicsEntity);
 
-        var graphicsEntity = createGraphicsEntity(baseEntity, texture);
-        graphics.addEntity(graphicsEntity, graphicsProperties);
+        var graphicsEntity = createGraphicsEntity(baseEntity, texture, graphicsProperties);
+        graphics.addEntity(graphicsEntity);
 
         return baseEntity;
     }
@@ -248,6 +248,72 @@ var Game = function () {
         }
     }
 
+    function loadLevel2() {
+        graphics.reset();
+        physics.reset();
+
+        function createPlane(w, h) {
+
+            var plane = [];
+            for (var r = 0; r < h; r++) {
+                var row = [];
+                for (var c = 0; c < w; c++) {
+                    row.push(true);
+                }
+                plane.push(row);
+            }
+
+            return plane;
+        }
+
+        function createMap(halfSize, off, map) {
+            var size = halfSize * 2;
+            var offsets = [];
+
+            for (var i = 0; i < map.length; i++) {
+                for (var j = 0; j < map[i].length; j++) {
+                    if (map[i][j]) {
+                        offsets.push([off[0] + i * size, off[1] + size, off[2] + j * size]);
+                    }
+                }
+            }
+
+            return offsets;
+        }
+
+
+        var dimensions = [30, 30];
+
+        var start = [1, 1];
+        var end = [28, 28];
+
+        var sphereScale = 0.9;
+        var sphere = addEntity(models.sphere.scale([0.9]), textures.solid, [start[0], 3, start[1]], {}, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
+
+        graphics.setFocus(sphere);
+
+        var mapScale = 1;
+
+        map = createMap(mapScale, [0, -2, 0], createPlane(dimensions[0], dimensions[1]));
+        for (var i = 0; i < map.length; i++) {
+            addEntity(models.cube, textures.box, map[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
+        }
+
+        map = createMap(mapScale, [0, 0, 0], maze.generateMaze(maze.Point(start[0], start[1]), maze.Point(end[0], end[1]), dimensions[0], dimensions[1]));
+        for (var i = 0; i < map.length; i++) {
+            addEntity(models.cube, textures.box, map[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
+        }
+
+        levelTick = function level1Tick() {
+            if (vec3.distance(sphere.position, [0, 0, 0]) > 100) {
+                loadLevel2();
+            }
+        }
+
+
+        addEntity(models.cube, textures.box, [end[0] * 2, 2, end[1] * 2], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0, 0, 0] });
+    }
+
     function start(m, images) {
         physics = Physics();
 
@@ -259,7 +325,7 @@ var Game = function () {
 
         attachUIEvents(graphics.getCanvas());
 
-        loadLevel1();
+        loadLevel2();
 
         setInterval(tick, 1000 / 60);
     }
