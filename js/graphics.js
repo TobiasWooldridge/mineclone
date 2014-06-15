@@ -48,21 +48,27 @@ var Graphics = function Graphics() {
         }));
 
 
-//        var center = vec3.negate(vec3.create(), mvMatrix.subarray(12, 15));
-//        console.log(center);
+        if (blend) {
+            function getFinalPosition(pos) {
+                var mv = mat4.translate(mat4.create(), mvMatrix, pos);
+                var vec = mat4.mul(mat4.create(), perspectiveMatrix, mv);
+                return vec.subarray(12, 15);
+            }
 
-//        entities.sort(function (a, b) {
-//            var ad = vec3.squaredDistance(a.position, center);
-//            var bd = vec3.squaredDistance(b.position, center);
-//
-//            return bd - ad;
-//        });
+            entities.sort(function (a, b) {
+                var ad = vec3.squaredLength(getFinalPosition(a.position));
+                var bd = vec3.squaredLength(getFinalPosition(b.position));
+
+                return bd - ad;
+            });
+        }
 
         var model, oldModel;
         var texture, oldTexture;
         var tint;
 
         // Draw all entities
+
         for (var entityIndex = 0; entityIndex < entities.length; entityIndex++) {
             var entity = entities[entityIndex];
 

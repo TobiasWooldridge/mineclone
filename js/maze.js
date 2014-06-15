@@ -131,33 +131,6 @@ var maze = (function maze() {
 
         paths.push(end);
         open(end);
-//
-//        // throw in some bad paths
-//        while (paths.length < (w * h)/4) {
-//            var p = paths.get(rand.nextInt(paths.size()));
-//
-//            while (adjacentsOpen(p) <= 2) {
-//                var next = null;
-//
-//                var neighbours = getNeighbours(currentPoint);
-//                for (var i = 0; i < neighbours.length; i++) {
-//                    var neighbour = neighbours[i];
-//                    if (canOpen(n)) {
-//                        next = n;
-//                        break;
-//                    }
-//                }
-//
-//                if (next != null) {
-//                    open(next);
-//                    paths.add(next);
-//                    p = next;
-//                }
-//                else {
-//                    break;
-//                }
-//            }
-//        }
 
         printGraph(graph);
 

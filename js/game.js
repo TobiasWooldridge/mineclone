@@ -10,7 +10,7 @@ var Game = function () {
 //    var fpsTimes = [];
 //    var fpsIdx = 0;
 
-    function tick () {
+    function tick() {
         var start = performance.now();
         var mvMatrix = graphics.getViewMatrix();
         gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
@@ -311,7 +311,7 @@ var Game = function () {
         }
 
 
-        addEntity(models.cube, textures.box, [end[0] * 2, 2, end[1] * 2], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0, 0, 0] });
+        addEntity(models.cube.scale([0.5]), textures.box, [end[0] * 2, 2, end[1] * 2], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0, 0, 0] });
     }
 
     function start(m, images) {
@@ -325,12 +325,12 @@ var Game = function () {
 
         attachUIEvents(graphics.getCanvas());
 
-        loadLevel2();
+        loadLevel1();
 
         setInterval(tick, 1000 / 60);
     }
 
     return {
-        start : start
+        start: start
     }
 };
