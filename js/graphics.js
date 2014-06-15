@@ -15,7 +15,7 @@ var Graphics = function Graphics() {
 
     var focus;
 
-    var blend = false;
+    var blending;
 
     function initWebGL() {
         gl = null;
@@ -48,7 +48,7 @@ var Graphics = function Graphics() {
         }));
 
 
-        if (blend) {
+        if (blending) {
             function getFinalPosition(pos) {
                 var mv = mat4.translate(mat4.create(), mvMatrix, pos);
                 var vec = mat4.mul(mat4.create(), perspectiveMatrix, mv);
@@ -105,7 +105,7 @@ var Graphics = function Graphics() {
                     tint[2] -= glow / 2;
                 }
 
-                gl.uniform4f(shaderProgram.tintUniform, tint[0], tint[1], tint[2], tint[3]);
+                gl.uniform4f(shaderProgram.tintUniform, tint[0], tint[1], tint[2], blending ? tint[3] : 1);
 
                 mvTranslate(entity.position);
                 setMatrixUniforms();
@@ -264,6 +264,21 @@ var Graphics = function Graphics() {
         mvMatrix = mvMatrixStack.pop();
     }
 
+    function setBlending(val) {
+        blending = val;
+
+        if (blending) {
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
+        else {
+            gl.disable(gl.BLEND);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+        }
+    }
+
     function start() {
         canvas = document.getElementById("glcanvas");
 
@@ -275,16 +290,6 @@ var Graphics = function Graphics() {
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
 
-        if (blend) {
-            gl.disable(gl.DEPTH_TEST);
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        }
-        else {
-            gl.disable(gl.BLEND);
-            gl.enable(gl.DEPTH_TEST);
-            gl.depthFunc(gl.LEQUAL);
-        }
 
         initShaders();
 
@@ -299,6 +304,7 @@ var Graphics = function Graphics() {
         window.addEventListener("resize", resize, false);
         resize();
 
+        setBlending(false);
 
         reset();
     }
@@ -341,6 +347,7 @@ var Graphics = function Graphics() {
         addEntities: addEntities,
         setFocus: setFocus,
         getCanvas: getCanvas,
-        reset: reset
+        reset: reset,
+        setBlending: setBlending
     }
 };

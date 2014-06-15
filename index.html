@@ -16,10 +16,34 @@
             left: 0;
             cursor: pointer;
         }
+
+        div#config {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #fff;
+            padding: 2px 5px;
+            font-family: consolas, menlo, monaco, monospace;
+            font-size: 0.9em;
+            opacity: 0.5;
+        }
+
+        div#config input {
+            padding: 0;
+            margin: 0;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
+
+
 <canvas id="glcanvas" width="1920" height="1080"></canvas>
+
+<div id="config">
+    <label>Blend: <input type="checkbox" id="blend"/></label>
+</div>
+
 <script id="blinnPhong-fs" type="x-shader/x-fragment">
 precision mediump float;
 

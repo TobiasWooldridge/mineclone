@@ -99,6 +99,10 @@ var Game = function () {
         canvas.addEventListener("DOMMouseScroll", function (event) {
             graphics.zoom(event.detail < 0 ? 3 : -3);
         }, false);
+
+        document.getElementById("blend").addEventListener("change", function () {
+            graphics.setBlending(document.getElementById("blend").checked)
+        });
     }
 
     function loadLevel1() {
