@@ -44,9 +44,11 @@ var Game = function () {
 
         var physicsEntity = createPhysicsEntity(baseEntity, physicsProperties);
         physics.addEntity(physicsEntity);
+        baseEntity.physics = physicsEntity;
 
         var graphicsEntity = createGraphicsEntity(baseEntity, texture, graphicsProperties);
         graphics.addEntity(graphicsEntity);
+        baseEntity.graphics = graphicsEntity;
 
         return baseEntity;
     }
@@ -128,7 +130,7 @@ var Game = function () {
 
         var sphere = addEntity(models.sphere, textures.solid, [0, 3, 0], { }, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
 
-        graphics.setFocus(sphere);
+        graphics.setFocus(sphere.graphics);
 
         var mapScale = 1;
 
@@ -252,6 +254,13 @@ var Game = function () {
                 loadLevel1();
             }
         }
+
+
+        var goal = addEntity(models.cube.scale([0.5]), textures.box, [0, -2, 0], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0.5, 0.5, 0.5] });
+
+        goal.physics.addCollisionEvent(function () {
+            loadLevel2();
+        });
     }
 
     function loadLevel2() {
@@ -294,7 +303,7 @@ var Game = function () {
         var end = [28, 28];
 
         var sphereScale = 0.9;
-        var sphere = addEntity(models.sphere.scale([0.9]), textures.solid, [start[0], 3, start[1]], {}, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
+        var sphere = addEntity(models.sphere.scale([0.95]), textures.solid, [start[0], 2, start[1]], {}, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
 
         graphics.setFocus(sphere);
 
@@ -317,7 +326,11 @@ var Game = function () {
         }
 
 
-        addEntity(models.cube.scale([0.5]), textures.box, [end[0] * 2, 2, end[1] * 2], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0, 0, 0] });
+        var goal = addEntity(models.cube.scale([0.5]), textures.box, [end[0] * 2, 2, end[1] * 2], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0, 0, 0] });
+
+        goal.physics.addCollisionEvent(function () {
+            loadLevel2();
+        });
     }
 
     function start(m, images) {

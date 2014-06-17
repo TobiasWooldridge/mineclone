@@ -42,6 +42,7 @@ function Physics() {
                 if (normal) {
                     normals.push(normal);
                     entity.sharedProperties.colliding = 100;
+                    entity.collision();
                 }
                 else {
                     entity.sharedProperties.colliding -= 1;

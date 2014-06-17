@@ -1,5 +1,7 @@
 function createPhysicsEntity(baseEntity, properties) {
 
+    var callbacks = [];
+
     var physicsEntity = {
         position: baseEntity.position,
         model: baseEntity.model,
@@ -14,6 +16,21 @@ function createPhysicsEntity(baseEntity, properties) {
             this.velocity[0] += acceleration[0] * (time / 500);
             this.velocity[1] += acceleration[1] * (time / 500);
             this.velocity[2] += acceleration[2] * (time / 500);
+        },
+        collision: function () {
+            if (!callbacks.length) {
+                return;
+            }
+
+            for (var i = 0; i < callbacks.length; i++) {
+                callbacks[i]();
+            }
+        },
+        addCollisionEvent: function (e) {
+            callbacks.push(e);
+        },
+        removeCollisionEvent: function (e) {
+            callbacks.remove(e);
         }
     };
 

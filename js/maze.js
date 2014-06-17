@@ -132,8 +132,6 @@ var maze = (function maze() {
         paths.push(end);
         open(end);
 
-        printGraph(graph);
-
         return graph;
     }
 
