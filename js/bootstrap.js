@@ -38,7 +38,8 @@
 
     var models = {
         cube : './objects/cube.obj',
-        block : './objects/block.obj'
+        block: './objects/block.obj',
+        teapot: './objects/teapot.obj'
     };
 
     var images = {

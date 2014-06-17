@@ -62,7 +62,7 @@ var Model = (function() {
         };
 
 
-//        verifyModel(model);
+        verifyModel(model);
 
         return model;
     }
