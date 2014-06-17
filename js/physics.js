@@ -5,7 +5,7 @@ function Physics() {
 
     var movingParts = [];
 
-    var collisionDamping = 0.4;
+    var collisionDamping = 0.75;
 
     function tick(gravity) {
         var currentTime = (new Date).getTime();
@@ -25,11 +25,12 @@ function Physics() {
         }
     }
 
+
     function processCollisions() {
+        var vr, vt;
+
         for (var i = 0; i < movingParts.length; i++) {
             var movingPart = movingParts[i];
-
-            var normals = [];
 
             for (var j = 0; j < entities.length; j++) {
                 var entity = entities[j];
@@ -40,25 +41,28 @@ function Physics() {
                 var normal = detectCollision(movingPart, entity);
 
                 if (normal) {
-                    normals.push(normal);
+                    entity.collision(movingPart, normal);
+                    movingPart.collision(entity, normal);
+
+                    // Update velocities
+                    vr = scaleVector(normal, dot(normal, movingPart.velocity) * collisionDamping);
+                    vt = subtractVector(movingPart.velocity, vr);
+                    movingPart.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
+
+                    if (!entity.stationary) {
+                        // Update velocities
+                        vr = scaleVector(normal, dot(normal, velocity.velocity) * collisionDamping);
+                        vt = subtractVector(movingPart.velocity, vr);
+                        entity.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
+                    }
+
                     entity.sharedProperties.colliding = 100;
-                    entity.collision();
                 }
                 else {
                     entity.sharedProperties.colliding -= 1;
                 }
             }
 
-            if (normals.length) {
-                var collisionNormal = normals.reduce(addVector, [0, 0, 0]);
-
-                for (var i = 0; i < 3; i++) {
-                    if (collisionNormal[i] != 0) {
-                        var normalSign = collisionNormal[i] > 0 ? 1 : -1;
-                        movingPart.velocity[i] = normalSign * Math.abs(movingPart.velocity[i]) * collisionDamping;
-                    }
-                }
-            }
         }
     }
 
