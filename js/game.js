@@ -255,7 +255,8 @@ var Game = function () {
             }
         }
 
-        addEntity(models.teapot.scale([0.1]), textures.solid, [0, 8, 00], { tint: [1, 1, 1, 0.5] }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
+        addEntity(models.teapot.scale([0.1]), textures.solid, [0, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
+        addEntity(models.teapot.scale([0.1]), textures.solid, [8, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 1 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
 
         var goal = addEntity(models.block.scale([0.5]), textures.cubeDims, [0, -2, 0], { tint: [1, 1, 1, 1] }, { stationary: true, type: "box", halfSize: [0.5, 0.5, 0.5] });
 

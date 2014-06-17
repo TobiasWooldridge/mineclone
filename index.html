@@ -74,7 +74,7 @@ void main() {
 
     vec3 halfDir = normalize(lightDir + viewDir);
     float specAngle = max(dot(halfDir, normal), 0.0);
-    specular = pow(specAngle, 16.0 * (1.25 - uShiny));
+    specular = pow(specAngle, 16.0) * uShiny;
   }
 
   gl_FragColor = vec4(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)).rgb, 1) *
