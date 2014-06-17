@@ -95,13 +95,19 @@ function Physics() {
 //            foundCollision = foundCollision || surfaceCollision;
 //        }
 
-
-        // EDGE-SPHERE COLLISION
         var closestPoint = vec3.create();
 
-        closestPoint[0] = (relCenter[0] < -box.halfSize[0]) ? -box.halfSize[0] : (relCenter[0] > box.halfSize[0]) ? box.halfSize[0] : relCenter[0];
-        closestPoint[1] = (relCenter[1] < -box.halfSize[1]) ? -box.halfSize[1] : (relCenter[1] > box.halfSize[1]) ? box.halfSize[1] : relCenter[1];
-        closestPoint[2] = (relCenter[2] < -box.halfSize[2]) ? -box.halfSize[2] : (relCenter[2] > box.halfSize[2]) ? box.halfSize[2] : relCenter[2];
+        for (var i = 0; i < 3; i++) {
+            if (relCenter[i] < -box.halfSize[i]) {
+                closestPoint[i] = -box.halfSize[i];
+            }
+            else if (relCenter[i] > box.halfSize[i]) {
+                closestPoint[i] = box.halfSize[i]
+            }
+            else {
+                closestPoint[i] = relCenter[i];
+            }
+        }
 
         var dist = vec3.distance(relCenter, closestPoint);
 
