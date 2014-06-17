@@ -256,7 +256,7 @@ var Game = function () {
         }
 
 
-        var goal = addEntity(models.cube.scale([0.5]), textures.box, [0, -2, 0], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0.5, 0.5, 0.5] });
+        var goal = addEntity(models.block.scale([0.5]), textures.cubeDims, [0, -2, 0], { tint: [1, 1, 1, 1] }, { stationary: true, type: "box", halfSize: [0.5, 0.5, 0.5] });
 
         goal.physics.addCollisionEvent(function () {
             loadLevel2();

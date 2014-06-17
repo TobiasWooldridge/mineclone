@@ -62,9 +62,7 @@ var Model = (function() {
         };
 
 
-        //createNormals(model);
-
-        verifyModel(model);
+//        verifyModel(model);
 
         return model;
     }
