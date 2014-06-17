@@ -71,12 +71,6 @@ function Physics() {
     function detectSphereBoxCollision(sphere, box) {
         var relCenter = subtractVector(sphere.position, box.position);
 
-        for (var i = 0; i < 3; i++) {
-            if (Math.abs(relCenter[i]) > box.halfSize[i] + sphere.radius) {
-                return;
-            }
-        }
-
         var closestPoint = vec3.create();
 
         for (var i = 0; i < 3; i++) {

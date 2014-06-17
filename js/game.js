@@ -38,8 +38,8 @@ var Game = function () {
             // Log FPS
             var fps = Math.round((fpsSample * 1000) / (fpsTimes[fpsSample - 1] - fpsTimes[0]));
             document.getElementById("fps").textContent = fps;
-            document.getElementById("graphicsTime").textContent = (physicsEnd - start).toFixed(2);
-            document.getElementById("physicsTime").textContent = (graphicsEnd - physicsEnd).toFixed(2);
+            document.getElementById("physicsTime").textContent = (physicsEnd - start).toFixed(2);
+            document.getElementById("graphicsTime").textContent = (graphicsEnd - physicsEnd).toFixed(2);
         }
     }
 
