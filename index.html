@@ -81,6 +81,7 @@ void main() {
                  vec4(uTint);
 }
 
+
 </script>
 <script id="blinnPhong-vs" type="x-shader/x-vertex">
 attribute vec3 inputPosition;
@@ -103,6 +104,7 @@ void main(){
 }
 
 
+
 </script>
 
 <script id="simpleTexture-fs" type="x-shader/x-fragment">
@@ -113,6 +115,7 @@ uniform sampler2D uSampler;
 void main(void) {
     gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
 }
+
 
 </script>
 <script id="simpleTexture-vs" type="x-shader/x-vertex">
@@ -129,18 +132,16 @@ void main(void) {
     vTextureCoord = aTextureCoord;
 }
 
+
 </script>
 
 
 <!-- Libraries -->
 <script src="js/lib/gl-matrix.js"></script>
 <script src="js/lib/async.js"></script>
-<script src="js/lib/curry.js"></script>
 
 <!-- My code -->
 <script src="js/util/friendly.js"></script>
-<script src="js/util/palette.js"></script>
-
 <script src="js/util/maths.js"></script>
 
 <script src="js/entity/model.js"></script>

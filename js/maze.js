@@ -81,8 +81,8 @@ var maze = (function maze() {
             return Math.abs(a.y - b.y) + Math.abs(a.x - b.x) == 1;
         }
 
-        var open = curry(set, [true]);
-        var close = curry(set, [false]);
+        var open = _.curry(set, [true]);
+        var close = _.curry(set, [false]);
 
         // Build an empty maze
         var graph = [];

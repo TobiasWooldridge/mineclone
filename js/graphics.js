@@ -21,11 +21,14 @@ var Graphics = function Graphics() {
         gl = null;
 
         try {
-            gl = canvas.getContext("webgl");
+            gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            ;
         }
-        catch (e) {
+        catch (e) {}
+
+        if (!gl) {
             alert("Unable to initialize WebGL. Your browser may not support it.");
-            throw e;
+            throw "Unable to initialize WebGL";
         }
     }
 
@@ -251,10 +254,9 @@ var Graphics = function Graphics() {
     }
 
 
-    var radConst = Math.PI / 180.0
-
+    var literallyIsPiDivide180 = Math.PI / 180.0;
     function mvRotate(degrees, axis) {
-        mat4.rotate(mvMatrix, mvMatrix, degrees * radConst, axis);
+        mat4.rotate(mvMatrix, mvMatrix, degrees * literallyIsPiDivide180, axis);
     }
 
     var mvMatrixStack = [];
