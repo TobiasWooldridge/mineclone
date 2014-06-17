@@ -49,13 +49,6 @@ function Physics() {
                     vt = subtractVector(movingPart.velocity, vr);
                     movingPart.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
 
-                    if (!entity.stationary) {
-                        // Update velocities
-                        vr = scaleVector(normal, dot(normal, velocity.velocity) * collisionDamping);
-                        vt = subtractVector(movingPart.velocity, vr);
-                        entity.velocity = vec3.add(vt, vec3.negate(vr, vr));
-                    }
-
                     entity.sharedProperties.colliding = 100;
                 }
                 else {
@@ -78,26 +71,11 @@ function Physics() {
     function detectSphereBoxCollision(sphere, box) {
         var relCenter = subtractVector(sphere.position, box.position);
 
-        // SURFACE-SPHERE COLLISION
-//        if (!foundCollision) {
-//            var surfaceCollision = true;
-//
-//            for (var i = 0; i < 3; i++) {
-//                if (i == maxIdx) {
-//                    if (Math.abs(relCenter[i]) > sphere.radius + box.halfSize[i]) {
-//                        surfaceCollision = false;
-//                        break;
-//                    }
-//                }
-//                else {
-//                    if (Math.abs(relCenter[i]) > box.halfSize[i]) {
-//                        surfaceCollision = false;
-//                        break;
-//                    }
-//                }
-//            }
-//            foundCollision = foundCollision || surfaceCollision;
-//        }
+        for (var i = 0; i < 3; i++) {
+            if (Math.abs(relCenter[i]) > box.halfSize[i] + sphere.radius) {
+                return;
+            }
+        }
 
         var closestPoint = vec3.create();
 

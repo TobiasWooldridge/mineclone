@@ -7,8 +7,9 @@ var Game = function () {
 
     var levelTick;
 
-//    var fpsTimes = [];
-//    var fpsIdx = 0;
+    var fpsTimes = [];
+    var fpsIdx = 0;
+    var fpsSample = 15;
 
     function tick() {
         var start = performance.now();
@@ -16,26 +17,30 @@ var Game = function () {
         gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
 
         physics.tick(gravity);
-        var p = performance.now();
+        var physicsEnd = performance.now();
 
         graphics.draw();
-        var g = performance.now();
+        var graphicsEnd = performance.now();
 
 
         if (levelTick != undefined) {
             levelTick();
         }
 
-//        console.log(p - start, g - p);
 
-//        var fpsTime = performance.now();
-//        fpsTimes[fpsIdx] = fpsTime;
-//        fpsIdx++;
-//        if (fpsIdx >= 60) {
-//            // Log FPS
-//            console.log(60000 / (fpsTimes[59] - fpsTimes[0]));
-//            fpsIdx = 0;
-//        }
+        // Calculate average FPS time over [fpsSample] frames
+        var fpsTime = performance.now();
+        fpsTimes[fpsIdx] = fpsTime;
+        fpsIdx++;
+        if (fpsIdx >= fpsSample) {
+            fpsIdx = 0;
+
+            // Log FPS
+            var fps = Math.round((fpsSample * 1000) / (fpsTimes[fpsSample - 1] - fpsTimes[0]));
+            document.getElementById("fps").textContent = fps;
+            document.getElementById("graphicsTime").textContent = (physicsEnd - start).toFixed(2);
+            document.getElementById("physicsTime").textContent = (graphicsEnd - physicsEnd).toFixed(2);
+        }
     }
 
 
@@ -257,7 +262,9 @@ var Game = function () {
 
         var smallTeapot = models.teapot.scale([0.1]);
         addEntity(smallTeapot, textures.solid, [-8, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0.2 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
+//        addEntity(smallTeapot, textures.solid, [-4, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0.425 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
         addEntity(smallTeapot, textures.solid, [0, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0.5 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
+//        addEntity(smallTeapot, textures.solid, [4, 8, 0], { tint:  [1, 1, 1, 0.5], shininess: 0.75 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
         addEntity(smallTeapot, textures.solid, [8, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 1 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
 
         var goal = addEntity(models.block.scale([0.5]), textures.cubeDims, [0, -2, 0], { tint: [1, 1, 1, 1] }, { stationary: true, type: "box", halfSize: [0.5, 0.5, 0.5] });
@@ -350,7 +357,7 @@ var Game = function () {
 
         loadLevel1();
 
-        setInterval(tick, 1000 / 60);
+        setInterval(tick, 1000 / 100);
     }
 
     return {

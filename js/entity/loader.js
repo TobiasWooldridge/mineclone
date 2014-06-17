@@ -76,8 +76,6 @@ var loader = (function () {
                     return (+x) - 1;
                 });
 
-                console.log(face);
-
                 // Complex faces are either just vertex
                 vertexIndices.push(triangles++);
                 _.pushAll(vertices, vertexBuffer[+face[0]])
@@ -100,7 +98,7 @@ var loader = (function () {
     }
 
     return {
-        getResource : getResource,
-        parseObj : parseObj
+        getResource: getResource,
+        parseObj: parseObj
     };
 })();

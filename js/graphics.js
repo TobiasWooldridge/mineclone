@@ -22,9 +22,9 @@ var Graphics = function Graphics() {
 
         try {
             gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-            ;
         }
-        catch (e) {}
+        catch (e) {
+        }
 
         if (!gl) {
             alert("Unable to initialize WebGL. Your browser may not support it.");
@@ -34,7 +34,7 @@ var Graphics = function Graphics() {
 
     function updatePerspectiveMatrix() {
         var fieldOfView = 45;
-        var aspectRatio = canvas.width/canvas.height;
+        var aspectRatio = canvas.width / canvas.height;
         var minRenderDistance = 0.1;
         var maxRenderDistance = 200;
 
@@ -42,7 +42,7 @@ var Graphics = function Graphics() {
         gl.uniformMatrix4fv(shaderProgram.pUniform, false, new Float32Array(perspectiveMatrix));
     }
 
-    function draw () {
+    function draw() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         loadCameraMatrix();
@@ -246,6 +246,7 @@ var Graphics = function Graphics() {
     }
 
     var mvMatrixInverseTranspose = mat4.create();
+
     function setMatrixUniforms() {
         gl.uniformMatrix4fv(shaderProgram.mvUniform, false, mvMatrix);
 
@@ -257,11 +258,13 @@ var Graphics = function Graphics() {
 
 
     var literallyIsPiDivide180 = Math.PI / 180.0;
+
     function mvRotate(degrees, axis) {
         mat4.rotate(mvMatrix, mvMatrix, degrees * literallyIsPiDivide180, axis);
     }
 
     var mvMatrixStack = [];
+
     function mvScope(fn) {
         mvMatrixStack.push(mat4.clone(mvMatrix));
         fn();
@@ -342,12 +345,12 @@ var Graphics = function Graphics() {
 
     return {
         start: start,
-        draw : draw,
-        initTextures : initTextures,
-        getCameraAngle : getCameraAngle,
+        draw: draw,
+        initTextures: initTextures,
+        getCameraAngle: getCameraAngle,
         zoom: zoom,
         getViewMatrix: loadCameraMatrix,
-        addEntity : addEntity,
+        addEntity: addEntity,
         addEntities: addEntities,
         setFocus: setFocus,
         getCanvas: getCanvas,
