@@ -65,7 +65,7 @@ void main() {
   vec3 normal = normalize(interpretedNormal);
   vec3 lightDir = normalize(lightPos - vertexPos);
 
-  float lambertian = max(dot(lightDir,normal), 0.0);
+  float lambertian = max(dot(lightDir,normal), 0.0) * (0.5 + uShiny);
   float specular = 0.0;
 
   if(lambertian > 0.0) {
