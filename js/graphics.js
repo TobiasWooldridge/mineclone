@@ -109,6 +109,7 @@ var Graphics = function Graphics() {
                 }
 
                 gl.uniform4f(shaderProgram.tintUniform, tint[0], tint[1], tint[2], blending ? tint[3] : 1);
+                gl.uniform1f(shaderProgram.shinyUniform, entity.shininess);
 
                 mvTranslate(entity.position);
                 setMatrixUniforms();
@@ -162,6 +163,7 @@ var Graphics = function Graphics() {
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
         shaderProgram.tintUniform = gl.getUniformLocation(shaderProgram, "uTint");
+        shaderProgram.shinyUniform = gl.getUniformLocation(shaderProgram, "uShiny");
 
         shaderProgram.pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");

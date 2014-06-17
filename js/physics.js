@@ -53,7 +53,7 @@ function Physics() {
                         // Update velocities
                         vr = scaleVector(normal, dot(normal, velocity.velocity) * collisionDamping);
                         vt = subtractVector(movingPart.velocity, vr);
-                        entity.velocity = addVector(vt, subtractVector([0, 0, 0], vr));
+                        entity.velocity = vec3.add(vt, vec3.negate(vr, vr));
                     }
 
                     entity.sharedProperties.colliding = 100;

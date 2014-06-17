@@ -128,7 +128,7 @@ var Game = function () {
 
         var sphereScale = 1;
 
-        var sphere = addEntity(models.sphere, textures.solid, [0, 3, 0], { }, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
+        var sphere = addEntity(models.sphere, textures.solid, [0, 3, 0], { shininess: 0.75 }, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
 
         graphics.setFocus(sphere.graphics);
 
@@ -304,7 +304,7 @@ var Game = function () {
         var end = [28, 28];
 
         var sphereScale = 0.9;
-        var sphere = addEntity(models.sphere.scale([0.95]), textures.solid, [start[0], 2, start[1]], {}, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
+        var sphere = addEntity(models.sphere.scale([0.95]), textures.solid, [start[0], 2, start[1]], { shininess: 0.75 }, { type: "sphere", radius: sphereScale, velocity: [0, 0, 0] });
 
         graphics.setFocus(sphere);
 
