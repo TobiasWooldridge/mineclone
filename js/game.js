@@ -41,6 +41,8 @@ var Game = function () {
             document.getElementById("physicsTime").textContent = (physicsEnd - start).toFixed(2);
             document.getElementById("graphicsTime").textContent = (graphicsEnd - physicsEnd).toFixed(2);
         }
+
+        window.requestAnimationFrame(tick);
     }
 
 
@@ -357,7 +359,8 @@ var Game = function () {
 
         loadLevel1();
 
-        setInterval(tick, 1000 / 100);
+        // Start ticking (tick method will be responsible for calling second etc. tick)
+        tick();
     }
 
     return {
