@@ -73,6 +73,42 @@ function Physics() {
     function detectSphereBoxCollision(sphere, box) {
         var relCenter = subtractVector(sphere.position, box.position);
 
+        // SURFACE-SPHERE COLLISION
+//        if (!foundCollision) {
+//            var surfaceCollision = true;
+//
+//            for (var i = 0; i < 3; i++) {
+//                if (i == maxIdx) {
+//                    if (Math.abs(relCenter[i]) > sphere.radius + box.halfSize[i]) {
+//                        surfaceCollision = false;
+//                        break;
+//                    }
+//                }
+//                else {
+//                    if (Math.abs(relCenter[i]) > box.halfSize[i]) {
+//                        surfaceCollision = false;
+//                        break;
+//                    }
+//                }
+//            }
+//            foundCollision = foundCollision || surfaceCollision;
+//        }
+
+
+        // EDGE-SPHERE COLLISION
+        var closestPoint = vec3.create();
+
+        closestPoint[0] = (relCenter[0] < -box.halfSize[0]) ? -box.halfSize[0] : (relCenter[0] > box.halfSize[0]) ? box.halfSize[0] : relCenter[0];
+        closestPoint[1] = (relCenter[1] < -box.halfSize[1]) ? -box.halfSize[1] : (relCenter[1] > box.halfSize[1]) ? box.halfSize[1] : relCenter[1];
+        closestPoint[2] = (relCenter[2] < -box.halfSize[2]) ? -box.halfSize[2] : (relCenter[2] > box.halfSize[2]) ? box.halfSize[2] : relCenter[2];
+
+        var dist = vec3.distance(relCenter, closestPoint);
+
+        if (dist > sphere.radius) {
+            return;
+        }
+
+        // Generate collision normal
         var maxIdx = 0;
         for (var i = 0; i < relCenter.length; i++) {
             if (Math.abs(relCenter[i]) > Math.abs(relCenter[maxIdx])) {
@@ -85,20 +121,8 @@ function Physics() {
         var collisionNormal = [0, 0, 0];
         collisionNormal[maxIdx] = sign;
 
-        // SURFACE-SPHERE COLLISION
-        for (var i = 0; i < 3; i++) {
-            if (i == maxIdx) {
-                if (Math.abs(relCenter[i]) > sphere.radius + box.halfSize[i]) {
-                    return;
-                }
-            }
-            else {
-                if (Math.abs(relCenter[i]) > box.halfSize[i]) {
-                    return;
-                }
-            }
-        }
 
+        // COLLISION RESPONSE
         // Move the sphere off of the box
         sphere.position[maxIdx] = box.position[maxIdx] + sign * (sphere.radius + box.halfSize[maxIdx]);
 

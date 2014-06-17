@@ -38,7 +38,7 @@ function createGraphicsEntity(baseEntity, texture, properties) {
         textureCoordBuffer: textureCoordBuffer,
         triangles: model.numTriangles,
         texture: texture,
-        tint: [1, 1, 1, 0.75]
+        tint: [1, 1, 1, 0.95]
     };
 
 
