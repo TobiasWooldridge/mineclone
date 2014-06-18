@@ -1,3 +1,7 @@
+performance.now = performance.now || function () {
+    return new Date().getTime();
+};
+
 var _ = {
     pushAll: function pushAll(base, ext) {
         base.push.apply(base, ext);
