@@ -1,6 +1,9 @@
-window.performance.now = typeof window.performance != undefined ? window.performance.now : function () {
-    return new Date().getTime();
-};
+if (window.performance == undefined) {
+    window.performance = {};
+    window.performance.now = function now() {
+        return new Date().getTime();
+    };
+}
 
 var _ = {
     pushAll: function pushAll(base, ext) {

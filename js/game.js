@@ -12,15 +12,15 @@ var Game = function () {
     var fpsSample = 15;
 
     function tick() {
-        var start = performance.now();
+        var start = window.performance.now();
         var mvMatrix = graphics.getViewMatrix();
         gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
 
         physics.tick(gravity);
-        var physicsEnd = performance.now();
+        var physicsEnd = window.performance.now();
 
         graphics.draw();
-        var graphicsEnd = performance.now();
+        var graphicsEnd = window.performance.now();
 
 
         if (levelTick != undefined) {
@@ -29,7 +29,7 @@ var Game = function () {
 
 
         // Calculate average FPS time over [fpsSample] frames
-        var fpsTime = performance.now();
+        var fpsTime = window.performance.now();
         fpsTimes[fpsIdx] = fpsTime;
         fpsIdx++;
         if (fpsIdx >= fpsSample) {
