@@ -1,3 +1,5 @@
+// TODO: Remove maths.js, it has been superceded in functionality by /lib/gl-matrix.js
+
 function magnitude(v) {
     return Math.sqrt(squareMagnitude(v));
 }

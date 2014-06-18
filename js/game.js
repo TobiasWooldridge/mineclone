@@ -12,17 +12,20 @@ var Game = function () {
     var fpsSample = 15;
 
     function tick() {
-        var start = window.performance.now();
         var mvMatrix = graphics.getViewMatrix();
         gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
 
+        var start = window.performance.now();
+
+        // Process physics. Done immediately before graphics to reduce frame latency
         physics.tick(gravity);
         var physicsEnd = window.performance.now();
 
+        // Draw everything to canvas
         graphics.draw();
         var graphicsEnd = window.performance.now();
 
-
+        // Process general events
         if (levelTick != undefined) {
             levelTick();
         }
@@ -258,17 +261,17 @@ var Game = function () {
         }
 
 
+        // Restart level if player falls off board
         levelTick = function level1Tick() {
             if (vec3.distance(sphere.position, [0, 0, 0]) > 50) {
                 loadLevel1();
             }
         }
 
+        // Draw some flying teapots just to highlight the fact that I can
         var smallTeapot = models.teapot.scale([0.1]);
         addEntity(smallTeapot, textures.solid, [-8, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0.2 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
-//        addEntity(smallTeapot, textures.solid, [-4, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0.425 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
         addEntity(smallTeapot, textures.solid, [0, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 0.5 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
-//        addEntity(smallTeapot, textures.solid, [4, 8, 0], { tint:  [1, 1, 1, 0.5], shininess: 0.75 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
         addEntity(smallTeapot, textures.solid, [8, 8, 0], { tint: [1, 1, 1, 0.5], shininess: 1 }, { stationary: true, type: "box", halfSize: [1, 1, 1] });
 
         var goal = addEntity(models.block.scale([0.5]), textures.cubeDims, [0, -2, 0], { tint: [1, 1, 1, 1] }, { stationary: true, type: "box", halfSize: [0.5, 0.5, 0.5] });
@@ -335,11 +338,12 @@ var Game = function () {
             addEntity(models.cube, textures.box, map[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
         }
 
-        levelTick = function level1Tick() {
+        // Restart level if player falls off board
+        levelTick = function level2Tick() {
             if (vec3.distance(sphere.position, [0, 0, 0]) > 100) {
                 loadLevel2();
             }
-        }
+        };
 
 
         var goal = addEntity(models.cube.scale([0.5]), textures.box, [end[0] * 2, 2, end[1] * 2], { tint: [1, 1, 0, 1] }, { stationary: true, type: "box", halfSize: [0, 0, 0] });

@@ -6,17 +6,21 @@ if (window.performance == undefined) {
 }
 
 var _ = {
+    // Push all members of ext to base
     pushAll: function pushAll(base, ext) {
         base.push.apply(base, ext);
     },
 
-    push3: function pushAll(base, ext) {
+    // Push first three members of ext to base
+    push3: function push3(base, ext) {
         base.push(ext[0], ext[1], ext[2]);
     },
 
-    push4: function pushAll(base, ext) {
+    // Push first four members of ext to base
+    push4: function push4(base, ext) {
         base.push(ext[0], ext[1], ext[2], ext[3]);
     },
+
 
     // Curry function written by Douglas Crockford
     // http://www.crockford.com/javascript/www_svendtofte_com/code/curried_javascript/index.html
