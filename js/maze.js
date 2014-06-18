@@ -1,3 +1,6 @@
+// Copyright 2014 Tobias Wooldridge
+// Ported from Java originally written in March 2014
+
 var maze = (function maze() {
     var self = {};
 

@@ -35,7 +35,7 @@ var Game = function () {
         if (fpsIdx >= fpsSample) {
             fpsIdx = 0;
 
-            // Log FPS
+            // Display FPS/physics time/graphics time every [fpsSample] frames
             var fps = Math.round((fpsSample * 1000) / (fpsTimes[fpsSample - 1] - fpsTimes[0]));
             document.getElementById("fps").textContent = fps;
             document.getElementById("physicsTime").textContent = (physicsEnd - start).toFixed(2);
@@ -45,7 +45,7 @@ var Game = function () {
         window.requestAnimationFrame(tick);
     }
 
-
+    // Add an entity to the graphics/physics engines
     function addEntity(model, texture, position, graphicsProperties, physicsProperties) {
         var baseEntity = createEntity(model, position);
 
@@ -60,6 +60,7 @@ var Game = function () {
         return baseEntity;
     }
 
+    // Attach UI events, e.g. mouse drag/camera move events
     function attachUIEvents(canvas) {
         var mouseSens = 750;
 
@@ -114,6 +115,7 @@ var Game = function () {
         });
     }
 
+    // Load a simple map
     function loadLevel1() {
         graphics.reset();
         physics.reset();
@@ -276,6 +278,7 @@ var Game = function () {
         });
     }
 
+    // Automagically generate a level using maze.js
     function loadLevel2() {
         graphics.reset();
         physics.reset();
