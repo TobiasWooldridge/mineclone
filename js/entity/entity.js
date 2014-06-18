@@ -1,9 +1,7 @@
 function createEntity(model, position, properties) {
-    var entity = {
+    return {
         model: model,
         position: position,
         properties: properties || {}
-    }
-
-    return entity;
+    };
 }

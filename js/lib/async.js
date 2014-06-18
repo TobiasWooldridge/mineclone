@@ -429,7 +429,7 @@
         callback = callback || function () {
         };
         var keys = _keys(tasks);
-        var remainingTasks = keys.length
+        var remainingTasks = keys.length;
         if (!remainingTasks) {
             return callback();
         }
@@ -449,7 +449,7 @@
             }
         };
         var taskComplete = function () {
-            remainingTasks--
+            remainingTasks--;
             _each(listeners.slice(0), function (fn) {
                 fn();
             });
@@ -536,7 +536,8 @@
                 data = data[data.length - 1];
                 (wrappedCallback || callback)(data.err, data.result);
             });
-        }
+        };
+        ;
         // If a callback is passed, run this as a controll flow
         return callback ? wrappedTask() : wrappedTask
     };
@@ -859,7 +860,7 @@
 
         function _compareTasks(a, b) {
             return a.priority - b.priority;
-        };
+        }
 
         function _binarySearch(sequence, item, compare) {
             var beg = -1,

@@ -13,7 +13,7 @@ var Game = function () {
 
     function tick() {
         var mvMatrix = graphics.getViewMatrix();
-        gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
+        var gravity = scaleVector(normalize([-mvMatrix[1], -mvMatrix[5], -mvMatrix[9]]), 5);
 
         var start = window.performance.now();
 
@@ -32,8 +32,7 @@ var Game = function () {
 
 
         // Calculate average FPS time over [fpsSample] frames
-        var fpsTime = window.performance.now();
-        fpsTimes[fpsIdx] = fpsTime;
+        fpsTimes[fpsIdx] = window.performance.now();
         fpsIdx++;
         if (fpsIdx >= fpsSample) {
             fpsIdx = 0;
@@ -266,7 +265,7 @@ var Game = function () {
             if (vec3.distance(sphere.position, [0, 0, 0]) > 50) {
                 loadLevel1();
             }
-        }
+        };
 
         // Draw some flying teapots just to highlight the fact that I can
         var smallTeapot = models.teapot.scale([0.1]);
@@ -328,7 +327,7 @@ var Game = function () {
 
         var mapScale = 1;
 
-        map = createMap(mapScale, [0, -2, 0], createPlane(dimensions[0], dimensions[1]));
+        var map = createMap(mapScale, [0, -2, 0], createPlane(dimensions[0], dimensions[1]));
         for (var i = 0; i < map.length; i++) {
             addEntity(models.cube, textures.box, map[i], {}, { stationary: true, type: "box", halfSize: [mapScale, mapScale, mapScale] });
         }

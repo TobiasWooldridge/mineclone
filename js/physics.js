@@ -65,6 +65,7 @@ function Physics() {
         }
         else {
             console.error("Could not process collision between " + a.type + " and " + b.type);
+            return;
         }
     }
 
@@ -138,4 +139,4 @@ function Physics() {
         addEntities: addEntities,
         reset: reset
     }
-};
+}

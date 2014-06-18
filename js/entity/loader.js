@@ -22,7 +22,7 @@ var loader = (function () {
             vn: vertexNormalsBuffer,
             vt: vertexTextureCoordsBuffer,
             f: facesBuffer
-        }
+        };
 
         var lines = objFile.split("\n");
 
@@ -31,10 +31,7 @@ var loader = (function () {
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
 
-            if (line[0] == '#') {
-                continue;
-            }
-            else if (line.match(vectorExp)) {
+            if (line[0] != '#' && line.match(vectorExp)) {
                 var tokens = vectorExp.exec(line);
 
                 var label = tokens[1];
@@ -78,7 +75,7 @@ var loader = (function () {
 
                 // Complex faces are either just vertex
                 vertexIndices.push(triangles++);
-                _.pushAll(vertices, vertexBuffer[+face[0]])
+                _.pushAll(vertices, vertexBuffer[+face[0]]);
 
                 // or Vertex/Texture coordinate
                 if (face.length >= 2) {
@@ -92,9 +89,7 @@ var loader = (function () {
             }
         }
 
-        var model = Model.create(name, vertices, vertexIndices, vertexNormals, vertexTextureCoords);
-
-        return model;
+        return Model.create(name, vertices, vertexIndices, vertexNormals, vertexTextureCoords);
     }
 
     return {

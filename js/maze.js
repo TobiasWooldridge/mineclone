@@ -6,7 +6,7 @@ var maze = (function maze() {
 
     self.Point = function Point(x, y) {
         return { x: x, y: y };
-    }
+    };
 
 
     function printGraph(graph) {
@@ -40,15 +40,8 @@ var maze = (function maze() {
         }
 
         function validSpace(p) {
-            if (p.x - 1 < 0 || p.x + 1 >= w) {
-                return false;
-            }
-            if (p.y - 1 < 0 || p.y + 1 >= h) {
-                return false;
-            }
-            return true;
-//
-            return !(graph[p.y] == undefined || graph[p.y][p.x] == undefined);
+            return !(p.x - 1 < 0 || p.x + 1 >= w || p.y - 1 < 0 || p.y + 1 >= h);
+
         }
 
         function getNeighbours(p) {
@@ -136,7 +129,7 @@ var maze = (function maze() {
         open(end);
 
         return graph;
-    }
+    };
 
     return self;
 })();

@@ -122,7 +122,7 @@ var Graphics = function Graphics() {
     }
 
     function loadCameraMatrix() {
-        mat4.identity(mvMatrix)
+        mat4.identity(mvMatrix);
 
         mvTranslate(cameraPosition);
         mvRotate(cameraAngle[0], [1, 0, 0]);
