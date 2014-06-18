@@ -1,4 +1,4 @@
-performance.now = performance.now || function () {
+window.performance.now = typeof window.performance != undefined ? window.performance.now : function () {
     return new Date().getTime();
 };
 
