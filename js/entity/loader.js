@@ -26,25 +26,25 @@ var loader = (function () {
 
         var lines = objFile.split("\n");
 
-        var vectorExp = /([a-z]+)\s+([\-0-9\./]+)\s+([\-0-9\./]+)\s+([\-0-9\./]+)?/ig;
-
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
 
-            if (line[0] != '#' && line.match(vectorExp)) {
-                var tokens = vectorExp.exec(line);
+            if (line[0] != '#') {
+                var tokens = line.split(" ");
 
-                var label = tokens[1];
-                var vector = tokens.slice(2, 2 + 3);
+                var label = tokens[0];
+                var vector = tokens.slice(1);
 
                 if (label == 'vt') {
                     buffersByLabels[label].push([+vector[0], +vector[1]]);
                 }
                 else if (label == 'f') {
-                    buffersByLabels[label].push(vector[0], vector[1], vector[2]);
+                    _.pushAll(buffersByLabels[label], vector);
                 }
                 else if (buffersByLabels[label] != undefined) {
-                    buffersByLabels[label].push([vector[0], vector[1], vector[2]]);
+                    buffersByLabels[label].push(vector.map(function (x) {
+                        return +x;
+                    }));
                 }
             }
         }
@@ -61,7 +61,7 @@ var loader = (function () {
             }
 
             for (var i = 0; i < facesBuffer.length; i++) {
-                vertexIndices.push(facesBuffer[i]);
+                vertexIndices.push(+facesBuffer[i]);
             }
         }
         // HANDLE LOADING OF ACTUAL .obj FILES

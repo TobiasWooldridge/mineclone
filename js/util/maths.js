@@ -3,14 +3,6 @@
 function magnitude(v) {
     return Math.sqrt(squareMagnitude(v));
 }
-
-function normalize(v) {
-    var mag = magnitude(v);
-    return v.map(function (x) {
-        return x / mag;
-    });
-}
-
 function squareMagnitude(v) {
     return v.reduce(function (x, y) {
         return x + (y * y);
@@ -63,6 +55,15 @@ function dot(a, b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
-function randInt(low, high) {
-    return Math.floor((Math.abs(Math.random()) * (high - low)) + low);
+function calculateNormal(a, b, c) {
+    var u = vec3.create();
+    vec3.sub(u, b, a);
+
+    var v = vec3.create();
+    vec3.sub(v, c, a);
+
+    var normal = vec3.create();
+    vec3.cross(normal, u, v);
+    vec3.normalize(normal, normal);
+    return normal;
 }
